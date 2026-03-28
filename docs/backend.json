@@ -1,0 +1,518 @@
+{
+  "entities": {
+    "UserProfile": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "UserProfile",
+      "type": "object",
+      "description": "Represents a user profile within the EstAi platform, storing public user information and system-assigned roles.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the UserProfile entity. This typically corresponds to the Firebase Authentication UID. (PK)"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The user's chosen display name."
+        },
+        "email": {
+          "type": "string",
+          "description": "The user's email address.",
+          "format": "email"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the user profile was created.",
+          "format": "date-time"
+        },
+        "role": {
+          "type": "string",
+          "description": "The role of the user within the application, determining access to features (e.g., 'signedIn')."
+        }
+      },
+      "required": [
+        "id",
+        "displayName",
+        "email",
+        "createdAt",
+        "role"
+      ]
+    },
+    "Listing": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Listing",
+      "type": "object",
+      "description": "Represents a property listing posted for sale or rent by a user.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Listing entity. (PK)"
+        },
+        "ownerId": {
+          "type": "string",
+          "description": "Reference to the UserProfile who owns this listing. (Relationship: UserProfile 1:N Listing)"
+        },
+        "status": {
+          "type": "string",
+          "description": "Current status of the listing (e.g., 'active', 'pending', 'sold', 'rented')."
+        },
+        "mode": {
+          "type": "string",
+          "description": "Indicates if the property is for 'sale' or 'rent'."
+        },
+        "type": {
+          "type": "string",
+          "description": "The type of property (e.g., 'apartment', 'villa', 'plot', 'commercial')."
+        },
+        "title": {
+          "type": "string",
+          "description": "A concise title for the property listing."
+        },
+        "description": {
+          "type": "string",
+          "description": "A detailed description of the property."
+        },
+        "price": {
+          "type": "number",
+          "description": "The sale price of the property, if applicable (for 'sale' mode)."
+        },
+        "rentMonthly": {
+          "type": "number",
+          "description": "The monthly rent for the property, if applicable (for 'rent' mode)."
+        },
+        "areaSqft": {
+          "type": "number",
+          "description": "The total area of the property in square feet."
+        },
+        "bedrooms": {
+          "type": "number",
+          "description": "The number of bedrooms in the property."
+        },
+        "bathrooms": {
+          "type": "number",
+          "description": "The number of bathrooms in the property."
+        },
+        "furnishing": {
+          "type": "string",
+          "description": "Details about the furnishing status (e.g., 'furnished', 'semi-furnished', 'unfurnished')."
+        },
+        "parking": {
+          "type": "boolean",
+          "description": "Indicates if parking is available for the property."
+        },
+        "floor": {
+          "type": "number",
+          "description": "The floor number where the property is located."
+        },
+        "ageYears": {
+          "type": "number",
+          "description": "The age of the property in years since construction."
+        },
+        "facing": {
+          "type": "string",
+          "description": "The direction the property faces (e.g., 'North', 'East')."
+        },
+        "amenities": {
+          "type": "array",
+          "description": "A list of standardized amenities available with the property.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "location": {
+          "type": "string",
+          "description": "Geographical location details including latitude, longitude, geohash, locality, city, and state. Stored as a string representing a JSON object for database-agnosticism if complex object nesting is not explicitly supported by the output schema, or a direct object if it is. For this schema, assume a string representation of the location object or a simple string for location name."
+        },
+        "media": {
+          "type": "string",
+          "description": "Media assets for the listing including a cover image URL and an array of additional image/video URLs. Stored as a string representing a JSON object for database-agnosticism if complex object nesting is not explicitly supported by the output schema, or a direct object if it is. For this schema, assume a string representation of the media object."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the listing was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp of the last update to the listing.",
+          "format": "date-time"
+        },
+        "views7d": {
+          "type": "number",
+          "description": "Number of unique views in the last 7 days (denormalized for analytics)."
+        },
+        "views30d": {
+          "type": "number",
+          "description": "Number of unique views in the last 30 days (denormalized for analytics)."
+        },
+        "saves7d": {
+          "type": "number",
+          "description": "Number of saves/favorites in the last 7 days (denormalized for analytics)."
+        },
+        "trendingScore": {
+          "type": "number",
+          "description": "Calculated score indicating the listing's current trending popularity (denormalized for analytics)."
+        }
+      },
+      "required": [
+        "id",
+        "ownerId",
+        "status",
+        "mode",
+        "type",
+        "title",
+        "description",
+        "areaSqft",
+        "bedrooms",
+        "bathrooms",
+        "furnishing",
+        "parking",
+        "floor",
+        "ageYears",
+        "amenities",
+        "location",
+        "media",
+        "createdAt",
+        "updatedAt",
+        "views7d",
+        "views30d",
+        "saves7d",
+        "trendingScore"
+      ]
+    },
+    "Project": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Project",
+      "type": "object",
+      "description": "Represents an upcoming real estate project, distinct from individual listings.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Project entity. (PK)"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the upcoming project."
+        },
+        "builder": {
+          "type": "string",
+          "description": "The name of the builder or developer for the project."
+        },
+        "locality": {
+          "type": "string",
+          "description": "The locality where the project is situated."
+        },
+        "city": {
+          "type": "string",
+          "description": "The city where the project is located."
+        },
+        "expectedHandoverDate": {
+          "type": "string",
+          "description": "The expected date when units in the project will be handed over.",
+          "format": "date"
+        },
+        "priceRangeMin": {
+          "type": "number",
+          "description": "The minimum expected price for units in the project."
+        },
+        "priceRangeMax": {
+          "type": "number",
+          "description": "The maximum expected price for units in the project."
+        },
+        "amenities": {
+          "type": "array",
+          "description": "A list of amenities offered within the project.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "media": {
+          "type": "string",
+          "description": "Media assets for the project including a cover image URL and an array of additional image/video URLs. Stored as a string representing a JSON object for database-agnosticism if complex object nesting is not explicitly supported by the output schema, or a direct object if it is. For this schema, assume a string representation of the media object."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the project entry was created.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "builder",
+        "locality",
+        "city",
+        "expectedHandoverDate",
+        "priceRangeMin",
+        "priceRangeMax",
+        "amenities",
+        "media",
+        "createdAt"
+      ]
+    },
+    "ListingViewEvent": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ListingViewEvent",
+      "type": "object",
+      "description": "Records an instance of a property listing being viewed by a user or guest, used for analytics.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the ListingViewEvent entity. (PK)"
+        },
+        "listingId": {
+          "type": "string",
+          "description": "Reference to the Listing that was viewed. (Relationship: Listing 1:N ListingViewEvent)"
+        },
+        "viewerHash": {
+          "type": "string",
+          "description": "A unique hash identifying the viewer (can be a user's UID or a guest hash for anonymity and deduplication)."
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Timestamp when the listing was viewed.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "listingId",
+        "viewerHash",
+        "timestamp"
+      ]
+    },
+    "ListingSaveEvent": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ListingSaveEvent",
+      "type": "object",
+      "description": "Records when a signed-in user saves (favorites) a property listing.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the ListingSaveEvent entity. (PK)"
+        },
+        "listingId": {
+          "type": "string",
+          "description": "Reference to the Listing that was saved. (Relationship: Listing 1:N ListingSaveEvent)"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the UserProfile who saved the listing. (Relationship: UserProfile 1:N ListingSaveEvent)"
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Timestamp when the listing was saved.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "listingId",
+        "userId",
+        "timestamp"
+      ]
+    },
+    "TrendingFeed": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "TrendingFeed",
+      "type": "object",
+      "description": "A curated list of trending property listings, updated periodically based on engagement metrics.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the TrendingFeed entity. This is typically a fixed ID like 'trending'. (PK)"
+        },
+        "listingIds": {
+          "type": "array",
+          "description": "An ordered array of Listing IDs that are currently trending. (Relationship: Listing N:N TrendingFeed)",
+          "items": {
+            "type": "string"
+          }
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp of the last time this feed was updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "listingIds",
+        "updatedAt"
+      ]
+    },
+    "MostViewedFeed": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "MostViewedFeed",
+      "type": "object",
+      "description": "A curated list of the most viewed property listings over a recent period.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the MostViewedFeed entity. This is typically a fixed ID like 'mostViewed'. (PK)"
+        },
+        "listingIds": {
+          "type": "array",
+          "description": "An ordered array of Listing IDs that have been most viewed. (Relationship: Listing N:N MostViewedFeed)",
+          "items": {
+            "type": "string"
+          }
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp of the last time this feed was updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "listingIds",
+        "updatedAt"
+      ]
+    },
+    "UpcomingProjectsFeed": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "UpcomingProjectsFeed",
+      "type": "object",
+      "description": "A curated list of upcoming real estate projects.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the UpcomingProjectsFeed entity. This is typically a fixed ID like 'upcomingProjects'. (PK)"
+        },
+        "projectIds": {
+          "type": "array",
+          "description": "An ordered array of Project IDs for upcoming projects. (Relationship: Project N:N UpcomingProjectsFeed)",
+          "items": {
+            "type": "string"
+          }
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp of the last time this feed was updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "projectIds",
+        "updatedAt"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous",
+      "google.com"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/userProfiles/{userId}",
+        "definition": {
+          "entityName": "UserProfile",
+          "schema": {
+            "$ref": "#/backend/entities/UserProfile"
+          },
+          "description": "Stores user profile information. The document ID (`userId`) corresponds to the Firebase Authentication UID. Access is restricted to the owning user for write operations. Includes denormalized 'id' matching 'userId' for authorization independence."
+        }
+      },
+      {
+        "path": "/listings/{listingId}",
+        "definition": {
+          "entityName": "Listing",
+          "schema": {
+            "$ref": "#/backend/entities/Listing"
+          },
+          "description": "Contains detailed property listings. Publicly readable if 'status' is 'active'. Owners can manage their own listings (read, write, delete). Includes denormalized 'ownerId' for authorization independence.",
+          "params": [
+            {
+              "name": "listingId",
+              "description": "Unique identifier for the specific property listing."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/projects/{projectId}",
+        "definition": {
+          "entityName": "Project",
+          "schema": {
+            "$ref": "#/backend/entities/Project"
+          },
+          "description": "Stores information about upcoming real estate projects. This collection is publicly readable by all users.",
+          "params": [
+            {
+              "name": "projectId",
+              "description": "Unique identifier for the specific upcoming project."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/events_views/{eventId}",
+        "definition": {
+          "entityName": "ListingViewEvent",
+          "schema": {
+            "$ref": "#/backend/entities/ListingViewEvent"
+          },
+          "description": "Records individual listing view events for analytics. Primarily write-only by Cloud Functions. Includes denormalized 'viewerHash' for tracking.",
+          "params": [
+            {
+              "name": "eventId",
+              "description": "Unique identifier for the specific listing view event."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/events_saves/{eventId}",
+        "definition": {
+          "entityName": "ListingSaveEvent",
+          "schema": {
+            "$ref": "#/backend/entities/ListingSaveEvent"
+          },
+          "description": "Records when a signed-in user saves a listing. Users can only write their own save events. Primarily used for analytics and user's saved lists. Includes denormalized 'userId' for authorization independence.",
+          "params": [
+            {
+              "name": "eventId",
+              "description": "Unique identifier for the specific listing save event."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/feeds/trending",
+        "definition": {
+          "entityName": "TrendingFeed",
+          "schema": {
+            "$ref": "#/backend/entities/TrendingFeed"
+          },
+          "description": "A single document containing an ordered list of currently trending listing IDs. This document is publicly readable by all users and updated by Cloud Functions. The fixed ID 'trending' is used."
+        }
+      },
+      {
+        "path": "/feeds/mostViewed",
+        "definition": {
+          "entityName": "MostViewedFeed",
+          "schema": {
+            "$ref": "#/backend/entities/MostViewedFeed"
+          },
+          "description": "A single document containing an ordered list of most viewed listing IDs. This document is publicly readable by all users and updated by Cloud Functions. The fixed ID 'mostViewed' is used."
+        }
+      },
+      {
+        "path": "/feeds/upcomingProjects",
+        "definition": {
+          "entityName": "UpcomingProjectsFeed",
+          "schema": {
+            "$ref": "#/backend/entities/UpcomingProjectsFeed"
+          },
+          "description": "A single document containing an ordered list of upcoming project IDs. This document is publicly readable by all users and updated by Cloud Functions. The fixed ID 'upcomingProjects' is used."
+        }
+      }
+    ],
+    "reasoning": "The recommended Firestore structure prioritizes Authorization Independence and Structural Segregation to ensure robust, debuggable security rules and efficient data access. \n\n1.  **Authorization Independence & Denormalization:** For entities where access depends on ownership, such as `Listing` and `ListingSaveEvent`, the `ownerId` or `userId` is explicitly denormalized within the document itself. For example, each `Listing` document includes an `ownerId` field, allowing Firestore security rules to evaluate `request.auth.uid == resource.data.ownerId` without making `get()` calls to a parent `UserProfile` document. This eliminates hierarchical authorization dependencies, enabling atomic operations (like creating a listing and its associated data) and simplifying rule logic. The `UserProfile` documents are stored under `/userProfiles/{userId}`, where the document ID matches the `request.auth.uid`, making self-ownership checks direct (`request.auth.uid == userId`).\n\n2.  **Structural Segregation & QAPs (Rules are not Filters):**\n    *   **Public Data:** `Projects` and all `Feed` documents (`TrendingFeed`, `MostViewedFeed`, `UpcomingProjectsFeed`) are placed in top-level collections (`/projects/{projectId}`, `/feeds/{feedId}`). These collections are designed with a homogeneous security posture: they are fully readable by all users (guests and signed-in), requiring simple `allow read: true;` rules (with administrative write access). This inherently supports QAPs, as any `list` operation on these collections will securely return all accessible documents without filtering issues.\n    *   **Mixed Public/Private Data (Listings):** The `Listing` collection (`/listings/{listingId}`) is structured to support both public browsing and owner-specific management. All 'active' listings are publicly readable, while any listing can be read/updated/deleted by its `ownerId`. The `status` field (`active`, `pending`, `sold`, etc.) is critical here. Security rules can permit `read` operations if `resource.data.status == 'active'` OR `request.auth.uid == resource.data.ownerId`. This design ensures `list` queries from clients (e.g., `db.collection('listings').where('status', '==', 'active')`) will only retrieve publicly allowed documents, adhering to QAPs.\n    *   **Private User Data:** `UserProfile` documents are private to the owning user for write operations, ensuring privacy and self-management capabilities (`/userProfiles/{userId}`).\n    *   **Analytics Events:** `ListingViewEvent` and `ListingSaveEvent` are primarily write-only collections, managed by Cloud Functions or directly by users for `ListingSaveEvent`. For `ListingSaveEvent`, the `userId` field ensures that a user can only create save events for themselves (`request.auth.uid == request.resource.data.userId`), directly supporting QAPs for write operations.\n\nThis structure, by denormalizing authorization context into each relevant document and segregating data based on its security posture, provides clear, concise, and debuggable security rules that inherently support query-ability and atomic operations."
+  }
+}

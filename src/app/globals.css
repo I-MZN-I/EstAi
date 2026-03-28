@@ -1,0 +1,110 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 240 10% 3.9%;
+    --foreground: 240 5% 95%;
+    --card: 240 6% 10%;
+    --card-foreground: 240 5% 95%;
+    --popover: 240 6% 10%;
+    --popover-foreground: 240 5% 95%;
+    --primary: 250 65% 60%;
+    --primary-foreground: 250 65% 5%;
+    --secondary: 240 10% 20%;
+    --secondary-foreground: 240 5% 95%;
+    --muted: 240 10% 20%;
+    --muted-foreground: 240 5% 65%;
+    --accent: 240 10% 20%;
+    --accent-foreground: 250 65% 60%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5% 25%;
+    --input: 240 5% 25%;
+    --ring: 250 70% 75%;
+
+    --radius: 0.5rem;
+
+    --chart-1: 250 65% 60%;
+    --chart-2: 250 50% 50%;
+    --chart-3: 250 40% 40%;
+    --chart-4: 250 30% 30%;
+    --chart-5: 250 20% 20%;
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 240 5% 95%;
+    --card: 240 6% 10%;
+    --card-foreground: 240 5% 95%;
+    --popover: 240 6% 10%;
+    --popover-foreground: 240 5% 95%;
+    --primary: 250 65% 60%;
+    --primary-foreground: 250 65% 5%;
+    --secondary: 240 10% 20%;
+    --secondary-foreground: 240 5% 95%;
+    --muted: 240 10% 20%;
+    --muted-foreground: 240 5% 65%;
+    --accent: 240 10% 20%;
+    --accent-foreground: 250 65% 60%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5% 25%;
+    --input: 240 5% 25%;
+    --ring: 250 70% 75%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Google Places Autocomplete dark theme */
+.pac-container {
+  background-color: hsl(240 6% 10%);
+  border: 1px solid hsl(240 5% 25%);
+  border-radius: 0.75rem;
+  margin-top: 4px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  font-family: inherit;
+  z-index: 10000;
+}
+
+.pac-item {
+  padding: 8px 12px;
+  color: hsl(240 5% 85%);
+  border-top: 1px solid hsl(240 5% 18%);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.pac-item:first-child {
+  border-top: none;
+}
+
+.pac-item:hover,
+.pac-item-selected {
+  background-color: hsl(250 65% 60% / 0.15);
+}
+
+.pac-item-query {
+  color: hsl(240 5% 95%);
+  font-weight: 600;
+}
+
+.pac-icon {
+  filter: invert(0.7);
+}
+
+.pac-matched {
+  color: hsl(250 65% 70%);
+  font-weight: 700;
+}

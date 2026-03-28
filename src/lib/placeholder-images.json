@@ -1,0 +1,94 @@
+{
+  "placeholderImages": [
+    {
+      "id": "villa_1",
+      "description": "Modern villa exterior",
+      "imageUrl": "https://images.unsplash.com/photo-1723110994499-df46435aa4b3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxtb2Rlcm4lMjB2aWxsYXxlbnwwfHx8fDE3NzE5MjczNzd8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "modern villa"
+    },
+    {
+      "id": "interior_1",
+      "description": "Luxurious living room",
+      "imageUrl": "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxsdXh1cnklMjBpbnRlcmlvcnxlbnwwfHx8fDE3NzE5ODM1NDR8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "luxury interior"
+    },
+    {
+      "id": "pool_1",
+      "description": "Infinity pool with a view",
+      "imageUrl": "https://images.unsplash.com/photo-1543489822-c49534f3271f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxpbmZpbml0eSUyMHBvb2x8ZW58MHx8fHwxNzcxOTgzNTQ0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "infinity pool"
+    },
+    {
+      "id": "apartment_1",
+      "description": "High-rise apartment exterior",
+      "imageUrl": "https://images.unsplash.com/photo-1641289426957-1748d0b5de04?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxjaXR5JTIwYXBhcnRtZW50fGVufDB8fHx8MTc3MTg3NzU3Nnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "city apartment"
+    },
+    {
+      "id": "interior_2",
+      "description": "Modern penthouse living area",
+      "imageUrl": "https://images.unsplash.com/photo-1642976975710-1d8890dbf5ab?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxwZW50aG91c2UlMjBpbnRlcmlvcnxlbnwwfHx8fDE3NzE5MjczNzd8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "penthouse interior"
+    },
+    {
+      "id": "view_1",
+      "description": "City skyline view from a balcony",
+      "imageUrl": "https://images.unsplash.com/photo-1577450775949-58ec8d02cad9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxjaXR5JTIwdmlld3xlbnwwfHx8fDE3NzE5ODM1NDR8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "city view"
+    },
+    {
+      "id": "apartment_2",
+      "description": "Charming European apartment facade",
+      "imageUrl": "https://images.unsplash.com/photo-1593386804775-efff289b8c95?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxldXJvcGVhbiUyMGJ1aWxkaW5nfGVufDB8fHx8MTc3MTk4MzU0NHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "european building"
+    },
+    {
+      "id": "interior_3",
+      "description": "Classic Parisian interior",
+      "imageUrl": "https://images.unsplash.com/photo-1688584270387-01810506c2ec?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxjbGFzc2ljJTIwaW50ZXJpb3J8ZW58MHx8fHwxNzcxOTgzNTQ0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "classic interior"
+    },
+    {
+      "id": "plot_1",
+      "description": "Empty residential plot of land",
+      "imageUrl": "https://images.unsplash.com/photo-1653663786108-21ca52a24171?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxsYW5kJTIwcGxvdHxlbnwwfHx8fDE3NzE5ODM1NDR8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "land plot"
+    },
+    {
+      "id": "commercial_1",
+      "description": "Modern office building exterior",
+      "imageUrl": "https://images.unsplash.com/photo-1600531529272-023c4b821f14?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxvZmZpY2UlMjBidWlsZGluZ3xlbnwwfHx8fDE3NzE5ODM1NDR8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "office building"
+    },
+    {
+      "id": "villa_2",
+      "description": "Large countryside estate",
+      "imageUrl": "https://images.unsplash.com/photo-1770398082094-25fd8689d319?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxjb3VudHJ5c2lkZSUyMGVzdGF0ZXxlbnwwfHx8fDE3NzE5ODM1NDR8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "countryside estate"
+    },
+    {
+      "id": "interior_4",
+      "description": "Grand dining hall in an estate",
+      "imageUrl": "https://images.unsplash.com/photo-1651400605618-3947e6562d52?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxncmFuZCUyMGludGVyaW9yfGVufDB8fHx8MTc3MTk4MzU0NHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "grand interior"
+    },
+    {
+      "id": "apartment_3",
+      "description": "Cozy modern studio apartment",
+      "imageUrl": "https://images.unsplash.com/photo-1702014857653-dcea938d51f0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxzdHVkaW8lMjBhcGFydG1lbnR8ZW58MHx8fHwxNzcxOTgzNTQ0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "studio apartment"
+    },
+    {
+      "id": "project_1",
+      "description": "Luxury residential project rendering",
+      "imageUrl": "https://images.unsplash.com/photo-1511818966892-d7d671e672a2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxsdXh1cnklMjBidWlsZGluZ3xlbnwwfHx8fDE3NzE5ODM1NDR8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "luxury building"
+    },
+    {
+      "id": "project_2",
+      "description": "Modern skyscraper project rendering",
+      "imageUrl": "https://images.unsplash.com/photo-1685211185729-9526bcc093ea?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBza3lzY3JhcGVyfGVufDB8fHx8MTc3MTk4MDE1NHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "modern skyscraper"
+    }
+  ]
+}

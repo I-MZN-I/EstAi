@@ -1,0 +1,199 @@
+/**
+ * Core Philosophy: This ruleset enforces a user-ownership model for private data while allowing public read access for shared content.
+ * The security model is designed for a real estate platform where users can manage their own profiles and listings, but anyone can
+ * browse publicly available listings, projects, and curated feeds.
+ *
+ * Data Structure: The data is organized into flat, top-level collections to simplify security rules and queries.
+ * - /userProfiles/{userId}: Private user-specific data, accessible only by the owner.
+ * - /listings/{listingId}: Property listings, which are publicly readable if 'active' but writable only by the owner.
+ * - /projects/{projectId}: Public information about real estate projects.
+ * - /feeds/{feedId}: Public, read-only documents containing curated lists of content.
+ * - /events_...: Analytics collections, with writes either restricted to owners or locked down for backend-only access.
+ *
+ * Key Security Decisions:
+ * - User Enumeration is Disallowed: The /userProfiles collection cannot be listed, protecting user privacy.
+ * - Public Listings: The /listings collection is publicly listable. Security for individual documents is enforced at read time
+ *   (on 'get'), requiring that a listing either be marked as 'active' or be accessed by its owner. This design relies on
+ *   client-side queries to filter for 'active' listings for public browsing.
+ * - Backend-Managed Content: All /feeds, /projects, and view event collections are read-only for clients, with the expectation
+ *   that they are managed by trusted backend processes or Cloud Functions.
+ *
+ * Denormalization for Authorization: To ensure fast and simple authorization checks, ownership data is denormalized.
+ * For example, each document in the `/listings` collection contains an `ownerId` field. This allows rules to verify ownership
+ * directly from the document itself (`resource.data.ownerId`) without performing slow and costly `get` operations on other collections.
+ *
+ * Structural Segregation: Data is segregated by its security posture. Fully public data like `/projects` and `/feeds` is
+ * kept separate from user-owned data like `/userProfiles` and mixed-access data like `/listings`. This creates clear,
+ * performant, and secure access patterns.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions to improve readability and reuse of logic.
+
+    /**
+     * @description Checks if a user is authenticated.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * @description Checks if the authenticated user's UID matches the provided userId.
+     * Typically used for path-based ownership checks (e.g., /users/{userId}).
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * @description Checks if the document being accessed already exists.
+     * CRITICAL for all update and delete operations to prevent modifying non-existent data.
+     */
+    function isExistingDoc() {
+      return resource != null;
+    }
+
+    /**
+     * @description Combines ownership and existence checks for update/delete on user-scoped documents.
+     */
+    function isExistingOwner(userId) {
+      return isOwner(userId) && isExistingDoc();
+    }
+
+    /**
+     * @description On create, validates that the incoming document's ownerId field matches the user.
+     */
+    function isCreatorOfDoc() {
+      return isSignedIn() && request.resource.data.ownerId == request.auth.uid;
+    }
+
+    /**
+     * @description For existing documents, validates that the user is the owner based on the ownerId field.
+     */
+    function isOwnerOfDoc() {
+      return isSignedIn() && request.auth.uid == resource.data.ownerId;
+    }
+    
+    /**
+     * @description On create, validates that the incoming document's userId field matches the user.
+     */
+    function isCreatorOfSaveEvent() {
+      return isSignedIn() && request.resource.data.userId == request.auth.uid;
+    }
+
+    /**
+     * @description For existing documents, validates that the user is the owner based on the userId field.
+     */
+    function isOwnerOfSaveEvent() {
+      return isSignedIn() && request.auth.uid == resource.data.userId;
+    }
+
+    /**
+     * @description A user can read a listing if it's public ('active') or if they are the owner.
+     */
+    function canReadListing() {
+      return resource.data.status == 'active' || isOwnerOfDoc();
+    }
+    
+    /**
+     * @description Enforces immutability of a field during an update operation.
+     */
+    function isImmutable(fieldName) {
+      return request.resource.data[fieldName] == resource.data[fieldName];
+    }
+
+    /**
+     * @description User Profiles store private user data.
+     * @path /userProfiles/{userId}
+     * @allow (create) A new user can create their own profile document.
+     * @deny (list) An authenticated user cannot list all documents in the userProfiles collection.
+     * @principle Restricts access to a user's own data tree and prevents user enumeration.
+     */
+    match /userProfiles/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false;
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isExistingOwner(userId) && isImmutable('id');
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Listings are property details that can be public or private.
+     * @path /listings/{listingId}
+     * @allow (get) Any user (signed-in or guest) can read a listing if its status is 'active'.
+     * @allow (create) An authenticated user can create a new listing for themselves.
+     * @deny (update) A user cannot update a listing that they do not own.
+     * @principle Implements a "Public Read with Owner-Only Writes" pattern.
+     */
+    match /listings/{listingId} {
+      allow get: if canReadListing();
+      allow list: if true;
+      allow create: if isCreatorOfDoc();
+      allow update: if isOwnerOfDoc() && isExistingDoc();
+      allow delete: if isOwnerOfDoc() && isExistingDoc();
+    }
+
+    /**
+     * @description Upcoming real estate projects. This data is for public consumption.
+     * @path /projects/{projectId}
+     * @allow (get, list) Any user, including guests, can read project information.
+     * @deny (create, update, delete) No client is allowed to modify project data.
+     * @principle Secures a collection as public and read-only, with writes managed by a trusted backend.
+     */
+    match /projects/{projectId} {
+      allow get: if true;
+      allow list: if true;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    /**
+     * @description Records listing view events for analytics.
+     * @path /events_views/{eventId}
+     * @allow (none) No client access is permitted.
+     * @deny (all) All client operations are denied.
+     * @principle Locks down a collection for exclusive use by backend services (e.g., Cloud Functions).
+     */
+    match /events_views/{eventId} {
+      allow get: if false;
+      allow list: if false;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    /**
+     * @description Records when a user saves a listing.
+     * @path /events_saves/{eventId}
+     * @allow (create) An authenticated user can create a save event for themself.
+     * @allow (delete) An authenticated user can delete their own save event (unsave).
+     * @deny (update) Save events are immutable and cannot be updated.
+     * @principle Enforces document ownership for writes and ensures a user can only act on their own behalf.
+     */
+    match /events_saves/{eventId} {
+      allow get: if isOwnerOfSaveEvent();
+      allow list: if isSignedIn();
+      allow create: if isCreatorOfSaveEvent();
+      allow update: if false;
+      allow delete: if isOwnerOfSaveEvent() && isExistingDoc();
+    }
+
+    /**
+     * @description Curated feeds of content, such as trending or most viewed listings.
+     * @path /feeds/{feedId}
+     * @allow (get) Any user, including guests, can read the curated feed documents.
+     * @deny (list, create, update, delete) Clients cannot modify feeds or list the '/feeds' collection.
+     * @principle Secures specific documents as public and read-only.
+     */
+    match /feeds/{feedId} {
+      allow get: if true;
+      allow list: if false;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
+    }
+  }
+}
