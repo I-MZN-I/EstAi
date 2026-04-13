@@ -451,10 +451,10 @@ export default function ListingDetailPage() {
               <div className="p-6 bg-card border border-emerald-500/20 rounded-lg space-y-4">
                 <div>
                   <p className="text-3xl font-bold text-foreground">
-                    ₹{posted.totalPrice?.toLocaleString()}
+                    <span className="rupee">₹</span>{posted.totalPrice?.toLocaleString()}
                   </p>
                   {posted.pricePerCent > 0 && (
-                    <p className="text-sm text-muted-foreground">₹{posted.pricePerCent.toLocaleString()} per cent</p>
+                    <p className="text-sm text-muted-foreground"><span className="rupee">₹</span>{posted.pricePerCent.toLocaleString()} per cent</p>
                   )}
                   <p className="text-emerald-400 capitalize mt-1">For {posted.mode}</p>
                 </div>

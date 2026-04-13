@@ -121,7 +121,7 @@ export default function ProjectsPage() {
                                                         {posted.title}
                                                     </h3>
                                                     <p className="text-2xl font-bold text-foreground mt-2">
-                                                        ₹{posted.totalPrice?.toLocaleString()}
+                                                        <span className="rupee">₹</span>{posted.totalPrice?.toLocaleString()}
                                                     </p>
                                                 </CardContent>
 

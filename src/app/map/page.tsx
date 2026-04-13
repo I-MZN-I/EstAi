@@ -183,7 +183,7 @@ export default function MapPage() {
           pinContainer.className = "flex flex-col items-center group cursor-pointer";
           pinContainer.innerHTML = `
             <div class="bg-emerald-900/90 text-emerald-400 text-[10px] font-bold px-2 py-1 rounded-full border border-emerald-500/30 mb-1 group-hover:bg-emerald-500 group-hover:text-white transition-all shadow-lg">
-              ₹${posted.totalPrice?.toLocaleString()}
+              <span style="font-family: system-ui, -apple-system, 'Segoe UI', sans-serif">₹</span>${posted.totalPrice?.toLocaleString()}
             </div>
             <div class="bg-emerald-500/20 text-emerald-400 p-2 rounded-full backdrop-blur-md border border-emerald-500/40 group-hover:bg-emerald-500 group-hover:text-white transition-all shadow-emerald-500/20 shadow-lg">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
@@ -391,7 +391,7 @@ export default function MapPage() {
                       {selectedPosted.city}
                     </p>
                     <p className="text-xl font-bold text-emerald-400">
-                      ₹{selectedPosted.totalPrice?.toLocaleString()}
+                      <span className="rupee">₹</span>{selectedPosted.totalPrice?.toLocaleString()}
                     </p>
                     {selectedPosted.distanceFromTown > 0 && (
                       <p className="text-[10px] font-semibold text-emerald-400 mt-1">

@@ -427,7 +427,7 @@ export default function ProfilePage() {
                                                         {property.mode === "sale" ? "For Sale" : "For Rent"}
                                                     </Badge>
                                                     <span className="text-xs font-bold text-primary">
-                                                        ₹{property.totalPrice?.toLocaleString()}
+                                                        <span className="rupee">₹</span>{property.totalPrice?.toLocaleString()}
                                                     </span>
                                                 </div>
                                             </div>

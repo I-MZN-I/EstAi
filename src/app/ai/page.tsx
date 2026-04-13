@@ -316,7 +316,7 @@ export default function AIPage() {
               <div>
                 <SectionTitle>Income</SectionTitle>
                 <div className="space-y-2">
-                  <Label>Monthly Rental Income (₹) — enter 0 if none</Label>
+                  <Label>Monthly Rental Income (<span className="rupee">₹</span>) — enter 0 if none</Label>
                   <Input type="number" min={0} placeholder="0"
                     value={form.monthlyIncome ?? 0}
                     onChange={(e) => set("monthlyIncome", Number(e.target.value))}

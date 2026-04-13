@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+/* PT Sans maps U+20B9 (₹) to the wrong glyph.
+   This class forces the Rupee symbol to render via the system UI font. */
+.rupee {
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans', sans-serif;
+}
+
 @layer base {
   :root {
     --background: 240 10% 3.9%;

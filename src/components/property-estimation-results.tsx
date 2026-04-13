@@ -21,16 +21,18 @@ import type {
 
 // ─── Formatting helpers ───────────────────────────────────────────────────────
 
-const fmt = (n: number) =>
+const fmtNumber = (n: number) =>
   new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
     maximumFractionDigits: 0,
   }).format(n);
 
+const fmt = (n: number) => (
+  <><span className="rupee">₹</span>{fmtNumber(n)}</>
+);
+
 const fmtCompact = (n: number) => {
-  if (n >= 10000000) return `₹${(n / 10000000).toFixed(2)} Cr`;
-  if (n >= 100000) return `₹${(n / 100000).toFixed(1)} L`;
+  if (n >= 10000000) return <><span className="rupee">₹</span>{(n / 10000000).toFixed(2)} Cr</>;
+  if (n >= 100000) return <><span className="rupee">₹</span>{(n / 100000).toFixed(1)} L</>;
   return fmt(n);
 };
 

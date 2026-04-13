@@ -962,10 +962,10 @@ export default function PostPropertyPage() {
                             </div>
 
                             <p className="text-3xl font-bold text-foreground font-headline mb-1">
-                              ₹{estimationResult.midPrice.toLocaleString()}
+                              <span className="rupee">₹</span>{estimationResult.midPrice.toLocaleString()}
                             </p>
                             <p className="text-xs text-primary mb-3">
-                              Suggested Range: ₹{estimationResult.minPrice.toLocaleString()} - ₹{estimationResult.maxPrice.toLocaleString()}
+                              Suggested Range: <span className="rupee">₹</span>{estimationResult.minPrice.toLocaleString()} - <span className="rupee">₹</span>{estimationResult.maxPrice.toLocaleString()}
                             </p>
 
                             <p className="text-sm text-muted-foreground leading-relaxed italic">
@@ -982,7 +982,7 @@ export default function PostPropertyPage() {
                       {/* ----------------------------- */}
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label>Total Asking Price (₹)</Label>
+                          <Label>Total Asking Price (<span className="rupee">₹</span>)</Label>
                           <Input
                             type="number"
                             min={0}
@@ -992,7 +992,7 @@ export default function PostPropertyPage() {
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label>Price per Cent (₹)</Label>
+                          <Label>Price per Cent (<span className="rupee">₹</span>)</Label>
                           <Input
                             type="number"
                             min={0}
@@ -1204,14 +1204,14 @@ export default function PostPropertyPage() {
                           <div>
                             <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Total Price</p>
                             <p className="text-2xl font-bold text-primary">
-                              ₹{form.totalPrice.toLocaleString()}
+                              <span className="rupee">₹</span>{form.totalPrice.toLocaleString()}
                             </p>
                           </div>
                           {form.pricePerCent > 0 && (
                             <div className="text-right">
                               <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Price/Cent</p>
                               <p className="text-lg font-bold text-white">
-                                ₹{form.pricePerCent.toLocaleString()}
+                                <span className="rupee">₹</span>{form.pricePerCent.toLocaleString()}
                               </p>
                             </div>
                           )}

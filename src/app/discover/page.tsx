@@ -139,10 +139,10 @@ export default function DiscoverPage() {
                     </h3>
                     <p className="text-xs text-muted-foreground mb-2 capitalize">{posted.propertyType}</p>
                     <p className="text-2xl font-bold text-foreground mt-2">
-                      ₹{posted.totalPrice?.toLocaleString()}
+                      <span className="rupee">₹</span>{posted.totalPrice?.toLocaleString()}
                       {posted.pricePerCent > 0 && (
                         <span className="text-xs font-normal text-muted-foreground ml-2">
-                          (₹{posted.pricePerCent.toLocaleString()}/cent)
+                          (<span className="rupee">₹</span>{posted.pricePerCent.toLocaleString()}/cent)
                         </span>
                       )}
                     </p>
@@ -240,10 +240,10 @@ export default function DiscoverPage() {
                     </h3>
                     <p className="text-xs text-muted-foreground mb-2 capitalize">{posted.propertyType}</p>
                     <p className="text-2xl font-bold text-foreground mt-2">
-                      ₹{posted.totalPrice?.toLocaleString()}
+                      <span className="rupee">₹</span>{posted.totalPrice?.toLocaleString()}
                       {posted.pricePerCent > 0 && (
                         <span className="text-xs font-normal text-muted-foreground ml-2">
-                          (₹{posted.pricePerCent.toLocaleString()}/cent)
+                          (<span className="rupee">₹</span>{posted.pricePerCent.toLocaleString()}/cent)
                         </span>
                       )}
                     </p>
