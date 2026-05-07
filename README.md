@@ -7,9 +7,14 @@
 **Smarter buying, selling, and renting — powered by AI.**
 
 [![Next.js](https://img.shields.io/badge/Next.js-Framework-black?logo=next.js)](https://nextjs.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
+[![Firebase](https://img.shields.io/badge/Firebase-Firestore%20%7C%20Auth-orange?logo=firebase)](https://firebase.google.com/)
+
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-Styling-38bdf8?logo=tailwindcss)](https://tailwindcss.com/)
+
+[![Google GenAI](https://img.shields.io/badge/Google%20GenAI-AI%20Models-orange?logo=google)](https://ai.google.dev/)
+
+[![Google Maps](https://img.shields.io/badge/Google%20Maps-Map%20Integration-34a853?logo=googlemaps)](https://developers.google.com/maps)
 </div>
 
 ---
