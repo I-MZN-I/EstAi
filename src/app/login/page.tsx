@@ -147,16 +147,45 @@ export default function LoginPage() {
           description: "You've been signed in.",
         });
       } else {
-        await signInWithEmailAndPassword(auth, data.email, data.password);
-        toast({ title: "Signed in!", description: "Welcome back." });
+        try {
+          await signInWithEmailAndPassword(auth, data.email, data.password);
+          toast({ title: "Signed in!", description: "Welcome back." });
+        } catch (error: any) {
+          console.warn("Login attempt failed:", error.code);
+          
+          if (error.code === "auth/invalid-credential") {
+            toast({
+              variant: "destructive",
+              title: "Authentication Failed",
+              description: "No account found with this credential, or password incorrect. Please check your details or sign up first!",
+            });
+          } else {
+            toast({
+              variant: "destructive",
+              title: "Error",
+              description: error.message || "An unexpected error occurred.",
+            });
+          }
+        }
       }
       // The useEffect hook will handle the redirect
     } catch (error: any) {
       console.error(error);
+      const code = error?.code || "";
+      let description = "An unexpected error occurred.";
+      if (code === "auth/invalid-credential" || code === "auth/wrong-password" || code === "auth/user-not-found") {
+        description = "Invalid email or password. Please check your credentials or sign up for a new account.";
+      } else if (code === "auth/too-many-requests") {
+        description = "Too many failed attempts. Please try again later.";
+      } else if (code === "auth/email-already-in-use") {
+        description = "This email is already registered. Try signing in instead.";
+      } else if (error.message) {
+        description = error.message;
+      }
       toast({
         variant: "destructive",
-        title: "Authentication Failed",
-        description: error.message || "An unexpected error occurred.",
+        title: isSignUp ? "Sign Up Failed" : "Login Failed",
+        description,
       });
     } finally {
       setIsLoading(false);

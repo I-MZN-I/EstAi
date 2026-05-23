@@ -3,6 +3,8 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { useUser } from "@/firebase";
+import { db } from "@/firebase/config";
+import { collection, doc, setDoc, addDoc, serverTimestamp } from "firebase/firestore";
 import { AppLayout } from "@/components/layout/app-layout";
 import {
   Card,
@@ -520,35 +522,88 @@ export default function PostPropertyPage() {
   const handleSubmit = async () => {
     setSubmitting(true);
     try {
-      const propertyData: PostedProperty = {
-        id: isEditMode ? editingProperty!.id : `posted_${Date.now()}`,
-        userId: isEditMode ? editingProperty!.userId || user?.uid || "" : user?.uid || "",
-        ...form,
-        currency: isEditMode ? editingProperty!.currency || "₹" : "₹",
-        createdAt: isEditMode ? editingProperty!.createdAt : new Date().toISOString(),
+      const formAny = form as any;
+      const editingPropertyAny = editingProperty as any;
+
+      // Build the data payload matching our Excel-extracted snake_case features
+      const propertyData = {
+        userId: isEditMode ? (editingProperty?.userId || user?.uid || "") : (user?.uid || ""),
+        property_type: form.propertyType || formAny.property_type || "",
+        city: form.city || "",
+        cent: Number(form.cent) || 0,
+        sqft: Number(form.sqft) || 0,
+        total_floor: Number(form.totalFloors || formAny.total_floor) || 1,
+        bedroom: Number(form.bedrooms || formAny.bedroom) || 0,
+        bathroom: Number(form.bathrooms || formAny.bathroom) || 0,
+        rooms: Number(form.rooms) || 0,
+        furnished: Number(form.furnished) || 0,
+        distance_from_town: Number(form.distanceFromTown || formAny.distance_from_town) || 0,
+        nearest_town: form.nearestTownName || formAny.nearest_town || "",
+        road_facility: form.roadFacility || formAny.road_facility || "3",
+        nearest_landmark: form.nearestLandmark || formAny.nearest_landmark || "",
+        total_price: Number(form.totalPrice || formAny.total_price) || 0,
+        price_per_cent: Number(form.pricePerCent || formAny.price_per_cent) || 0,
+        latitude: Number(form.lat || formAny.latitude) || 0,
+        longitude: Number(form.lng || formAny.longitude) || 0,
+        mode: form.mode || "sale",
+        title: form.title || "",
+        description: form.description || "",
+        contact_name: form.contactName || formAny.contact_name || "",
+        contact_phone: form.contactPhone || formAny.contact_phone || "",
+        contact_email: form.contactEmail || formAny.contact_email || "",
+        images: form.images || [],
+        currency: isEditMode ? (editingProperty?.currency || "₹") : "₹",
+        updatedAt: serverTimestamp(), 
       };
 
-      // Save to API (Excel)
-      const res = await fetch("/api/properties", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(propertyData),
-      });
+      let targetId = "";
 
-      const result = await res.json();
-      if (!result.success) throw new Error(result.message);
-
-      // Save to context (localStorage)
-      if (isEditMode) {
-        updateProperty(propertyData);
+      if (isEditMode && editingProperty?.id) {
+        targetId = editingProperty.id;
+        const docRef = doc(db, "properties", targetId);
+        await setDoc(docRef, propertyData, { merge: true });
       } else {
-        addProperty(propertyData);
+        const collectionRef = collection(db, "properties");
+        const docRef = await addDoc(collectionRef, {
+          ...propertyData,
+          server_posted_date: serverTimestamp(),
+        });
+        targetId = docRef.id;
+      }
+
+      const localSyncData: PostedProperty = {
+        ...propertyData,
+        id: targetId,
+        createdAt: isEditMode ? editingProperty!.createdAt : new Date().toISOString(),
+        posted_date: isEditMode ? editingPropertyAny.posted_date : new Date().toISOString(),
+        // Map camelCase fields to satisfy PostedProperty typescript model
+        propertyType: form.propertyType || "",
+        totalFloors: Number(form.totalFloors) || 1,
+        bedrooms: Number(form.bedrooms) || 0,
+        bathrooms: Number(form.bathrooms) || 0,
+        distanceFromTown: Number(form.distanceFromTown) || 0,
+        nearestTownName: form.nearestTownName || "",
+        roadFacility: form.roadFacility || "3",
+        nearestLandmark: form.nearestLandmark || "",
+        totalPrice: Number(form.totalPrice) || 0,
+        pricePerCent: Number(form.pricePerCent) || 0,
+        contactName: form.contactName || "",
+        contactPhone: form.contactPhone || "",
+        contactEmail: form.contactEmail || "",
+        lat: Number(form.lat) || 0,
+        lng: Number(form.lng) || 0,
+      } as any;
+
+      if (isEditMode) {
+        updateProperty(localSyncData);
+      } else {
+        addProperty(localSyncData);
       }
 
       setSuccess(true);
       toast({
         title: isEditMode ? "Property Updated! ✅" : "Property Posted! 🎉",
-        description: isEditMode ? "Your changes have been saved." : "Your property is now live on EstAi.",
+        description: isEditMode ? "Your changes have been saved to Cloud Firestore." : "Your property is now live on EstAi.",
       });
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Failed to save property.";

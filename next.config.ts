@@ -8,6 +8,11 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  outputFileTracingIncludes: {
+    '/ai': ['./Data/**/*', './src/ai/**/*'],
+    '/post': ['./Data/**/*', './src/ai/**/*'],
+    '/api/**/*': ['./Data/**/*', './src/ai/**/*'],
+  },
   images: {
     remotePatterns: [
       {

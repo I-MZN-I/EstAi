@@ -177,7 +177,9 @@ export default function MapPage() {
 
         // User-posted property markers
         postedProperties.forEach((posted) => {
-          if (!posted.lat || !posted.lng) return;
+          const pLat = Number(posted.lat || (posted as any).latitude || 0);
+          const pLng = Number(posted.lng || (posted as any).longitude || 0);
+          if (!pLat || !pLng) return;
 
           const pinContainer = document.createElement('div');
           pinContainer.className = "flex flex-col items-center group cursor-pointer";
@@ -192,7 +194,7 @@ export default function MapPage() {
 
           const marker = new AdvancedMarkerElement({
             map: googleMap.current,
-            position: { lat: posted.lat, lng: posted.lng },
+            position: { lat: pLat, lng: pLng },
             title: posted.title,
             content: pinContainer,
           });
@@ -200,7 +202,7 @@ export default function MapPage() {
           marker.addListener('click', () => {
             setSelectedPosted(posted);
             setSelectedProperty(null);
-            googleMap.current.panTo({ lat: posted.lat, lng: posted.lng });
+            googleMap.current.panTo({ lat: pLat, lng: pLng });
           });
         });
       } catch (err: any) {

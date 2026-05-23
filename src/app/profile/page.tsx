@@ -12,6 +12,8 @@ import { Logo } from "@/components/logo";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth, useUser } from "@/firebase";
 import { signOut, updateProfile } from "firebase/auth";
+import { db } from "@/firebase/config";
+import { doc, deleteDoc } from "firebase/firestore";
 import { usePostedProperties } from "@/context/posted-properties-context";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -132,9 +134,17 @@ export default function ProfilePage() {
         }
     };
 
-    const handleDeleteProperty = (id: string, title: string) => {
-        removeProperty(id);
-        toast({ title: "Property removed", description: `"${title}" has been removed from your listings.` });
+    const handleDeleteProperty = async (id: string, title: string) => {
+        try {
+            const docRef = doc(db, "properties", id);
+            await deleteDoc(docRef);
+
+            removeProperty(id);
+            toast({ title: "Property removed", description: `"${title}" has been removed from your cloud listings.` });
+        } catch (error) {
+            console.error("Error deleting document: ", error);
+            toast({ variant: "destructive", title: "Delete Failed", description: "Could not remove listing from the cloud." });
+        }
     };
 
     const displayProperties = expandedProperties

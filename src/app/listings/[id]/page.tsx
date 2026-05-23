@@ -41,6 +41,8 @@ import {
 } from "lucide-react";
 import { useSavedProperties } from "@/context/saved-properties-context";
 import { useToast } from "@/hooks/use-toast";
+import { db } from "@/firebase/config";
+import { doc, deleteDoc } from "firebase/firestore";
 
 // Dark-mode style for inline map
 const mapStyle = [
@@ -312,10 +314,18 @@ export default function ListingDetailPage() {
     const furnishedLabel = posted.furnished === 2 ? "Fully Furnished" : posted.furnished === 1 ? "Semi-furnished" : "Unfurnished";
     const roadLabel = ({ "1": "Kutcha / Mud road", "2": "Paved road", "3": "Tarred road", "4": "Highway" } as Record<string, string>)[posted.roadFacility] || posted.roadFacility;
 
-    const handleDeleteProperty = () => {
-      removeProperty(posted.id);
-      toast({ title: "Property deleted", description: `"${posted.title}" has been removed.` });
-      router.push("/profile");
+    const handleDeleteProperty = async () => {
+      try {
+        const docRef = doc(db, "properties", posted.id);
+        await deleteDoc(docRef);
+
+        removeProperty(posted.id);
+        toast({ title: "Property deleted", description: `"${posted.title}" has been removed.` });
+        router.push("/profile");
+      } catch (error) {
+        console.error("Error deleting document: ", error);
+        toast({ variant: "destructive", title: "Delete Failed", description: "Could not complete request." });
+      }
     };
 
     const keyFacts = [
