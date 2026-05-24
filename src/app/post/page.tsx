@@ -612,6 +612,7 @@ function PostPropertyForm({ user }: { user: any }) {
         images: form.images || [],
         currency: isEditMode ? (editingProperty?.currency || "₹") : "₹",
         updatedAt: serverTimestamp(), 
+        ...(isEditMode ? {} : { createdAt: serverTimestamp() }),
       };
 
       let targetId = "";

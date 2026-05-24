@@ -18,15 +18,59 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Search, MapPin, X, Navigation } from "lucide-react";
 import { properties, projects } from "@/lib/placeholder-data";
-import { usePostedProperties } from "@/context/posted-properties-context";
 import { useUser } from "@/firebase";
 import { motion, AnimatePresence } from "framer-motion";
+import { db } from "@/firebase/config";
+import { collection, query, where, orderBy, onSnapshot } from "firebase/firestore";
+import type { PostedProperty } from "@/lib/types";
+
+// Helper mapper to translate Firestore database schemas into camelCase PostedProperty models
+const mapDocToProperty = (doc: any): PostedProperty => {
+  const data = doc.data();
+  return {
+    id: doc.id,
+    userId: data.userId || "",
+    propertyType: data.propertyType || data.property_type || "",
+    mode: data.mode || "sale",
+    title: data.title || "",
+    description: data.description || "",
+    bedrooms: Number(data.bedrooms || data.bedroom) || 0,
+    bathrooms: Number(data.bathrooms || data.bathroom) || 0,
+    rooms: Number(data.rooms) || 0,
+    cent: Number(data.cent) || 0,
+    sqft: Number(data.sqft) || 0,
+    totalFloors: Number(data.totalFloors || data.total_floor) || 1,
+    nearestLandmark: data.nearestLandmark || data.nearest_landmark || "",
+    roadFacility: data.roadFacility || data.road_facility || "3",
+    totalPrice: Number(data.totalPrice || data.total_price) || 0,
+    pricePerCent: Number(data.pricePerCent || data.price_per_cent) || 0,
+    contactName: data.contactName || data.contact_name || "",
+    contactPhone: data.contactPhone || data.contact_phone || "",
+    contactEmail: data.contactEmail || data.contact_email || "",
+    images: data.images || [],
+    lat: Number(data.lat || data.latitude) || 0,
+    lng: Number(data.lng || data.longitude) || 0,
+    city: data.city || "",
+    state: data.state || "",
+    distanceFromTown: Number(data.distanceFromTown || data.distance_from_town) || 0,
+    nearestTownName: data.nearestTownName || data.nearest_town || "",
+    furnished: Number(data.furnished) || 0,
+    currency: data.currency || "₹",
+    createdAt: data.createdAt?.toDate 
+      ? data.createdAt.toDate().toISOString() 
+      : (data.createdAt || data.server_posted_date?.toDate 
+         ? data.server_posted_date.toDate().toISOString() 
+         : new Date().toISOString()),
+  };
+};
 
 export default function DiscoverPage() {
   const trendingProperties = properties.slice(0, 5);
   const mostViewedProperties = properties.slice(5, 11);
-  const { postedProperties } = usePostedProperties();
   const { user } = useUser();
+
+  const [recentlyCurated, setRecentlyCurated] = useState<PostedProperty[]>([]);
+  const [propertiesInFocus, setPropertiesInFocus] = useState<PostedProperty[]>([]);
 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchVal, setSearchVal] = useState("");
@@ -44,15 +88,46 @@ export default function DiscoverPage() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Filter to only properties posted within the last 7 days
-  const now = new Date();
-  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-  const recentlyPosted = postedProperties.filter(
-    (p) => new Date(p.createdAt) >= sevenDaysAgo
-  );
+  useEffect(() => {
+    // STREAM A: 'Recently Curated' Section (The 7-Day Window)
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-  // Apply search/filters
-  const recentlyPostedFiltered = recentlyPosted.filter((posted) => {
+    const qRecentlyCurated = query(
+      collection(db, "properties"),
+      where("createdAt", ">=", sevenDaysAgo),
+      orderBy("createdAt", "desc")
+    );
+
+    const unsubscribeA = onSnapshot(qRecentlyCurated, (snapshot) => {
+      const docs = snapshot.docs.map(mapDocToProperty);
+      setRecentlyCurated(docs);
+    }, (error) => {
+      console.error("Error streaming recently curated properties:", error);
+    });
+
+    // STREAM B: 'Properties in Focus' Matrix (Standard master list ordered by server_posted_date desc)
+    const qPropertiesInFocus = query(
+      collection(db, "properties"),
+      orderBy("server_posted_date", "desc")
+    );
+
+    const unsubscribeB = onSnapshot(qPropertiesInFocus, (snapshot) => {
+      const docs = snapshot.docs.map(mapDocToProperty);
+      setPropertiesInFocus(docs);
+    }, (error) => {
+      console.error("Error streaming properties in focus:", error);
+    });
+
+    // Clean up active listeners to prevent memory leaks
+    return () => {
+      unsubscribeA();
+      unsubscribeB();
+    };
+  }, []);
+
+  // Apply search/filters to the active streams
+  const recentlyPostedFiltered = recentlyCurated.filter((posted) => {
     const matchesQuery = queryText
       ? posted.title.toLowerCase().includes(queryText.toLowerCase()) ||
         posted.city.toLowerCase().includes(queryText.toLowerCase()) ||
@@ -73,7 +148,7 @@ export default function DiscoverPage() {
     return matchesQuery && matchesMode;
   });
 
-  const postedPropertiesFiltered = postedProperties.filter((posted) => {
+  const postedPropertiesFiltered = propertiesInFocus.filter((posted) => {
     const matchesQuery = queryText
       ? posted.title.toLowerCase().includes(queryText.toLowerCase()) ||
         posted.city.toLowerCase().includes(queryText.toLowerCase()) ||
@@ -121,7 +196,7 @@ export default function DiscoverPage() {
         </div>
 
         {/* User Posted Properties */}
-        {recentlyPostedFiltered.length > 0 && (
+        {recentlyCurated.length > 0 && recentlyPostedFiltered.length > 0 && (
           <section className="mb-28 bg-editorial-glow rounded-3xl p-8 border border-zinc-800/10">
             <div className="flex items-end justify-between mb-12">
               <div>
