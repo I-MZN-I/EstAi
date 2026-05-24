@@ -1,5 +1,8 @@
 "use client";
 
+export const dynamic = 'force-dynamic';
+
+import type { PostedProperty } from "@/lib/types";
 import { useEffect, useRef, useCallback, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -38,11 +41,12 @@ import {
   Trash2,
   Edit3,
   Shield,
+  Loader2,
 } from "lucide-react";
 import { useSavedProperties } from "@/context/saved-properties-context";
 import { useToast } from "@/hooks/use-toast";
 import { db } from "@/firebase/config";
-import { doc, deleteDoc } from "firebase/firestore";
+import { doc, deleteDoc, onSnapshot } from "firebase/firestore";
 import { cn } from "@/lib/utils";
 
 // Dark-mode style for inline map
@@ -63,7 +67,7 @@ export default function ListingDetailPage() {
   const params = useParams();
   const router = useRouter();
   const id = params?.id as string;
-  const { postedProperties, removeProperty } = usePostedProperties();
+  const { removeProperty } = usePostedProperties();
   const { user } = useUser();
   const { isSaved, toggleSave } = useSavedProperties();
   const { toast } = useToast();
@@ -72,10 +76,76 @@ export default function ListingDetailPage() {
 
   // Look up property in both placeholder and posted
   const placeholderProperty = properties.find((p) => p.id === id);
-  const postedProperty = postedProperties.find((p) => p.id === id);
+  const [liveProperty, setLiveProperty] = useState<PostedProperty | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!id) {
+      setLoading(false);
+      return;
+    }
+
+    if (placeholderProperty) {
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    const docRef = doc(db, "properties", id);
+    const unsubscribe = onSnapshot(docRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        setLiveProperty({
+          id: docSnap.id,
+          userId: data.userId || "",
+          propertyType: data.propertyType || data.property_type || "",
+          mode: data.mode || "sale",
+          title: data.title || "",
+          description: data.description || "",
+          bedrooms: Number(data.bedrooms || data.bedroom) || 0,
+          bathrooms: Number(data.bathrooms || data.bathroom) || 0,
+          rooms: Number(data.rooms) || 0,
+          cent: Number(data.cent) || 0,
+          sqft: Number(data.sqft) || 0,
+          totalFloors: Number(data.totalFloors || data.total_floor) || 1,
+          nearestLandmark: data.nearestLandmark || data.nearest_landmark || "",
+          roadFacility: data.roadFacility || data.road_facility || "3",
+          totalPrice: Number(data.totalPrice || data.total_price) || 0,
+          pricePerCent: Number(data.pricePerCent || data.price_per_cent) || 0,
+          contactName: data.contactName || data.contact_name || "",
+          contactPhone: data.contactPhone || data.contact_phone || "",
+          contactEmail: data.contactEmail || data.contact_email || "",
+          images: data.images || [],
+          lat: Number(data.lat || data.latitude) || 0,
+          lng: Number(data.lng || data.longitude) || 0,
+          city: data.city || "",
+          state: data.state || "",
+          distanceFromTown: Number(data.distanceFromTown || data.distance_from_town) || 0,
+          nearestTownName: data.nearestTownName || data.nearest_town || "",
+          furnished: Number(data.furnished) || 0,
+          currency: data.currency || "₹",
+          createdAt: data.createdAt?.toDate 
+            ? data.createdAt.toDate().toISOString() 
+            : (data.createdAt || data.server_posted_date?.toDate 
+               ? data.server_posted_date.toDate().toISOString() 
+               : new Date().toISOString()),
+        } as PostedProperty);
+        setLoading(false);
+      } else {
+        setLiveProperty(null);
+        setLoading(false);
+      }
+    }, (error) => {
+      console.error("Error fetching live property:", error);
+      setLiveProperty(null);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [id, placeholderProperty]);
 
   const property = placeholderProperty || null;
-  const posted = postedProperty || null;
+  const posted = liveProperty;
 
   // Determine shared values
   const title = property?.title || posted?.title || "";
@@ -165,6 +235,18 @@ export default function ListingDetailPage() {
     },
     [lat, lng]
   );
+
+  // ─── Loading Transition ────────────────────────────────────────────
+
+  if (loading) {
+    return (
+      <AppLayout>
+        <div className="min-h-screen w-full flex items-center justify-center bg-[#060608]">
+          <Loader2 className="w-8 h-8 text-primary animate-spin" />
+        </div>
+      </AppLayout>
+    );
+  }
 
   // ─── 404 ───────────────────────────────────────────────────────────
 
