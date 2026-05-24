@@ -1,6 +1,8 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { db, auth } from "@/firebase/config";
+import { collection, query, where, onSnapshot, setDoc, deleteDoc, doc } from "firebase/firestore";
 
 interface SavedPropertiesContextType {
     savedPropertyIds: string[];
@@ -18,39 +20,58 @@ export function SavedPropertiesProvider({ children }: { children: React.ReactNod
 
     useEffect(() => {
         setIsMounted(true);
-        try {
-            const stored = localStorage.getItem("savedProperties");
-            if (stored) {
-                setSavedPropertyIds(JSON.parse(stored));
-            }
-        } catch (error) {
-            console.error("Failed to load saved properties from localStorage", error);
-        }
     }, []);
 
-    const persistToStorage = (ids: string[]) => {
+    // Sync saved properties from Firestore for the currently logged-in user
+    useEffect(() => {
+        const unsubscribe = auth.onAuthStateChanged((user) => {
+            if (!user) {
+                setSavedPropertyIds([]);
+                return;
+            }
+
+            const q = query(
+                collection(db, "saved_properties"),
+                where("userId", "==", user.uid)
+            );
+
+            const unsub = onSnapshot(q, (snapshot) => {
+                const ids = snapshot.docs.map(doc => {
+                    const data = doc.data();
+                    return data.propertyId || doc.id.split("_")[1] || doc.id;
+                });
+                setSavedPropertyIds(ids);
+            });
+
+            return () => unsub();
+        });
+
+        return () => unsubscribe();
+    }, []);
+
+    const saveProperty = async (id: string) => {
+        const currentUser = auth.currentUser;
+        if (!currentUser) return;
         try {
-            localStorage.setItem("savedProperties", JSON.stringify(ids));
+            // Write a record to the saved_properties collection with userId tracking
+            await setDoc(doc(db, "saved_properties", `${currentUser.uid}_${id}`), {
+                userId: currentUser.uid,
+                propertyId: id,
+                createdAt: new Date().toISOString()
+            });
         } catch (error) {
-            console.error("Failed to save properties to localStorage", error);
+            console.error("Failed to save property to Firestore", error);
         }
     };
 
-    const saveProperty = (id: string) => {
-        setSavedPropertyIds((prev) => {
-            if (prev.includes(id)) return prev;
-            const newIds = [...prev, id];
-            persistToStorage(newIds);
-            return newIds;
-        });
-    };
-
-    const removeProperty = (id: string) => {
-        setSavedPropertyIds((prev) => {
-            const newIds = prev.filter((savedId) => savedId !== id);
-            persistToStorage(newIds);
-            return newIds;
-        });
+    const removeProperty = async (id: string) => {
+        const currentUser = auth.currentUser;
+        if (!currentUser) return;
+        try {
+            await deleteDoc(doc(db, "saved_properties", `${currentUser.uid}_${id}`));
+        } catch (error) {
+            console.error("Failed to remove property from Firestore", error);
+        }
     };
 
     const isSaved = (id: string) => {
@@ -64,9 +85,6 @@ export function SavedPropertiesProvider({ children }: { children: React.ReactNod
             saveProperty(id);
         }
     };
-
-    // Prevent hydration mismatch by not rendering until mounted
-    // or return context directly, but components using it should handle skeleton state
 
     return (
         <SavedPropertiesContext.Provider
