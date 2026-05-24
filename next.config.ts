@@ -9,9 +9,7 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   outputFileTracingIncludes: {
-    '/ai': ['./Data/**/*', './src/ai/**/*'],
-    '/post': ['./Data/**/*', './src/ai/**/*'],
-    '/api/**/*': ['./Data/**/*', './src/ai/**/*'],
+    '/': ['./Data/**/*', './src/ai/**/*'],
   },
   images: {
     remotePatterns: [

@@ -35,6 +35,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { LogIn, LogOut, ArrowRight, User } from "lucide-react";
+import { motion } from "framer-motion";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email." }),
@@ -48,10 +49,10 @@ type FormValues = z.infer<typeof formSchema>;
 export default function LoginPage() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const auth = useAuth();
   const { user, isUserLoading } = useUser();
-  const router = useRouter();
+  const auth = useAuth();
   const { toast } = useToast();
+  const router = useRouter();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -61,78 +62,90 @@ export default function LoginPage() {
     },
   });
 
+  // Redirect users if already logged in
   useEffect(() => {
-    const checkRedirect = async () => {
-      setIsLoading(true);
-      try {
-        const result = await getRedirectResult(auth);
-        if (result) {
-          toast({ title: "Signed in!", description: "Welcome back." });
-          router.push("/discover");
-        }
-      } catch (error: any) {
-        console.error("Google sign-in redirect error:", error);
-        toast({
-          variant: "destructive",
-          title: "Google Sign-In Failed",
-          description: error.message || "Could not complete sign-in with Google.",
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    if (user && !isUserLoading) {
+      router.push("/discover");
+    }
+  }, [user, isUserLoading, router]);
 
-    checkRedirect();
-  }, [auth, router, toast]);
+  // Handle redirect result for Google sign-in
+  useEffect(() => {
+    if (auth) {
+      getRedirectResult(auth)
+        .then((result) => {
+          if (result?.user) {
+            toast({
+              title: "Signed in with Google!",
+              description: `Welcome back, ${result.user.displayName || "User"}.`,
+            });
+          }
+        })
+        .catch((error) => {
+          console.error("Redirect sign-in failed:", error);
+          toast({
+            variant: "destructive",
+            title: "Sign-In Failed",
+            description: error.message || "An error occurred during redirect sign-in.",
+          });
+        });
+    }
+  }, [auth]);
 
   if (isUserLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-background">
-        <p className="text-muted-foreground">Loading...</p>
+        <div className="animate-pulse space-y-4 text-center">
+          <Logo className="text-4xl justify-center mb-2 animate-bounce" />
+          <p className="text-muted-foreground text-sm font-sans">Connecting securely...</p>
+        </div>
       </div>
     );
   }
 
-  // If user is already signed in, show a welcome-back screen instead of auto-redirecting
   if (user) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-background">
-        <Card className="mx-auto max-w-sm w-full bg-card border-white/10">
-          <CardHeader className="text-center">
-            <Logo className="text-4xl justify-center mb-2" />
-            <div className="flex justify-center mb-4">
+      <div className="flex items-center justify-center min-h-screen bg-background relative px-4">
+        <div className="w-full max-w-md p-10 bg-zinc-900/10 backdrop-blur-2xl border border-zinc-900/60 rounded-2xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7)] mx-auto text-center">
+          <div className="text-center mb-6">
+            <Logo className="text-4xl justify-center mb-4" />
+            <div className="flex justify-center mb-6">
               <div className="p-4 rounded-full bg-primary/10 border border-primary/20">
                 <User className="w-10 h-10 text-primary" />
               </div>
             </div>
-            <CardTitle className="text-2xl font-bold font-headline">
+            <h2 className="font-serif text-3xl font-light text-zinc-200 mb-2 text-center">
               Welcome Back!
-            </CardTitle>
-            <CardDescription>
+            </h2>
+            <p className="font-sans text-xs text-zinc-400">
               You&apos;re signed in as <strong className="text-primary">{user.email || "User"}</strong>
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="grid gap-3">
-            <Button
-              className="w-full gap-2"
-              onClick={() => router.push("/discover")}
-            >
-              <ArrowRight className="w-4 h-4" />
-              Continue to App
-            </Button>
-            <Button
-              variant="outline"
-              className="w-full gap-2 border-white/10 hover:bg-white/5"
-              onClick={async () => {
-                await signOut(auth);
-                toast({ title: "Signed out", description: "You have been signed out." });
-              }}
-            >
-              <LogOut className="w-4 h-4" />
-              Sign Out & Switch Account
-            </Button>
-          </CardContent>
-        </Card>
+            </p>
+          </div>
+          <div className="grid gap-3 mt-6">
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button
+                className="w-full bg-violet-600/90 text-white hover:bg-violet-600 font-sans text-xs uppercase tracking-wider transition-all duration-300 py-3 rounded-xl mt-4 font-semibold h-auto"
+                onClick={() => router.push("/discover")}
+              >
+                <ArrowRight className="w-4 h-4 mr-2 inline" />
+                Continue to App
+              </Button>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button
+                variant="outline"
+                className="w-full gap-2 border-white/10 hover:bg-white/5 rounded-xl h-11"
+                onClick={async () => {
+                  await signOut(auth);
+                  toast({ title: "Signed out", description: "You have been signed out." });
+                }}
+              >
+                <LogOut className="w-4 h-4" />
+                Sign Out & Switch Account
+              </Button>
+            </motion.div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -168,7 +181,6 @@ export default function LoginPage() {
           }
         }
       }
-      // The useEffect hook will handle the redirect
     } catch (error: any) {
       console.error(error);
       const code = error?.code || "";
@@ -195,8 +207,6 @@ export default function LoginPage() {
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
     const provider = new GoogleAuthProvider();
-    // We don't await here because the redirect will interrupt the flow.
-    // The result is handled by the useEffect hook.
     signInWithRedirect(auth, provider).catch((error) => {
       console.error(error);
       toast({
@@ -209,20 +219,20 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-background">
-      <Card className="mx-auto max-w-sm w-full bg-card border-white/10">
-        <CardHeader className="text-center">
-          <Logo className="text-4xl justify-center mb-2" />
-          <CardTitle className="text-2xl font-bold font-headline">
-            {isSignUp ? "Create an Account" : "Welcome Back"}
-          </CardTitle>
-          <CardDescription>
+    <div className="flex items-center justify-center min-h-screen bg-background px-4">
+      <div className="w-full max-w-md p-10 bg-zinc-900/10 backdrop-blur-2xl border border-zinc-900/60 rounded-2xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7)] mx-auto">
+        <div className="text-center pb-6">
+          <Logo className="text-4xl justify-center mb-4" />
+          <h2 className="font-serif text-3xl font-light text-zinc-200 mb-2 text-center">
+            {isSignUp ? "Create Account" : "Welcome Back"}
+          </h2>
+          <p className="font-sans text-[10px] uppercase tracking-widest text-zinc-400 font-semibold mt-1">
             {isSignUp
-              ? "Enter your email and password to sign up"
-              : "Enter your email below to login to your account"}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+              ? "Enter your details to register"
+              : "Enter your details below to log in"}
+          </p>
+        </div>
+        <div>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
               <FormField
@@ -230,13 +240,14 @@ export default function LoginPage() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel className="font-sans text-[10px] uppercase tracking-widest text-zinc-400 font-semibold">Email</FormLabel>
                     <FormControl>
                       <Input
                         type="email"
-                        placeholder="m@example.com"
+                        placeholder="email@example.com"
                         {...field}
                         disabled={isLoading}
+                        className="w-full bg-transparent border-b border-zinc-800/80 focus:border-violet-500/60 transition-colors text-sm py-2 px-0 rounded-none outline-none text-zinc-100"
                       />
                     </FormControl>
                     <FormMessage />
@@ -249,13 +260,13 @@ export default function LoginPage() {
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex items-center">
-                      <FormLabel>Password</FormLabel>
+                      <FormLabel className="font-sans text-[10px] uppercase tracking-widest text-zinc-400 font-semibold">Password</FormLabel>
                       {!isSignUp && (
                         <Link
                           href="#"
-                          className="ml-auto inline-block text-sm underline text-muted-foreground hover:text-primary"
+                          className="ml-auto inline-block text-[11px] text-muted-foreground hover:text-primary font-sans"
                         >
-                          Forgot your password?
+                          Forgot password?
                         </Link>
                       )}
                     </div>
@@ -265,48 +276,53 @@ export default function LoginPage() {
                         placeholder="••••••••"
                         {...field}
                         disabled={isLoading}
+                        className="w-full bg-transparent border-b border-zinc-800/80 focus:border-violet-500/60 transition-colors text-sm py-2 px-0 rounded-none outline-none text-zinc-100"
                       />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Loading..." : isSignUp ? "Sign Up" : "Login"}
-              </Button>
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="mt-2">
+                <Button type="submit" className="w-full bg-violet-600/90 text-white hover:bg-violet-600 font-sans text-xs uppercase tracking-wider transition-all duration-300 py-3 rounded-xl mt-4 font-semibold h-auto" disabled={isLoading}>
+                  {isLoading ? "Loading..." : isSignUp ? "Sign Up" : "Login"}
+                </Button>
+              </motion.div>
             </form>
           </Form>
-          <div className="relative my-4">
+          <div className="relative my-5">
             <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t"></span>
+              <span className="w-full border-t border-white/5"></span>
             </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-card px-2 text-muted-foreground">
+            <div className="relative flex justify-center text-[10px] uppercase font-sans tracking-widest text-muted-foreground/60">
+              <span className="bg-transparent px-3">
                 Or continue with
               </span>
             </div>
           </div>
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={handleGoogleSignIn}
-            disabled={isLoading}
-          >
-            {isLoading ? "Loading..." : "Login with Google"}
-          </Button>
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <Button
+              variant="outline"
+              className="w-full border-white/10 hover:bg-white/5 rounded-xl h-11 text-xs font-medium"
+              onClick={handleGoogleSignIn}
+              disabled={isLoading}
+            >
+              {isLoading ? "Loading..." : "Login with Google"}
+            </Button>
+          </motion.div>
 
-          <div className="mt-4 text-center text-sm">
+          <div className="mt-5 text-center text-xs font-sans text-muted-foreground">
             {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
             <button
               onClick={() => setIsSignUp(!isSignUp)}
-              className="underline text-muted-foreground hover:text-primary"
+              className="underline text-zinc-300 hover:text-primary transition-colors font-medium ml-1"
               disabled={isLoading}
             >
               {isSignUp ? "Sign in" : "Sign up"}
             </button>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

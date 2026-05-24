@@ -43,6 +43,7 @@ import { useSavedProperties } from "@/context/saved-properties-context";
 import { useToast } from "@/hooks/use-toast";
 import { db } from "@/firebase/config";
 import { doc, deleteDoc } from "firebase/firestore";
+import { cn } from "@/lib/utils";
 
 // Dark-mode style for inline map
 const mapStyle = [
@@ -201,16 +202,18 @@ export default function ListingDetailPage() {
 
     return (
       <AppLayout>
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 pt-24 pb-8 max-w-6xl relative bg-editorial-glow">
           <div className="mb-4">
-            <Link href="/discover" className="text-sm text-muted-foreground hover:text-primary inline-flex items-center gap-1">
+            <Link href="/discover" className="text-sm text-muted-foreground hover:text-primary inline-flex items-center gap-1 font-sans">
               <ArrowLeft className="w-4 h-4" /> Back to Discover
             </Link>
           </div>
-          <header className="mb-8">
-            <h1 className="text-4xl md:text-5xl font-headline font-bold text-foreground">{property.title}</h1>
-            <p className="text-lg text-muted-foreground mt-2">
-              {property.location.locality}, {property.location.city}
+          <header className="mb-8 relative">
+            <div className="absolute -top-10 -left-10 w-72 h-72 bg-violet-500/5 rounded-full blur-[80px] pointer-events-none" />
+            <h1 className="font-serif text-4xl font-light tracking-wide text-zinc-100 mb-2">{property.title}</h1>
+            <p className="font-sans text-[10px] uppercase tracking-widest text-zinc-400 font-semibold mt-2 flex items-center gap-1">
+              <MapPin className="w-4 h-4 text-primary" />
+              {property.location.locality}, <span className="text-gold">{property.location.city}</span>
             </p>
           </header>
 
@@ -230,70 +233,71 @@ export default function ListingDetailPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             <div className="lg:col-span-2">
-              <section className="mb-8">
-                <h2 className="text-2xl font-headline font-semibold mb-4 border-b pb-2">Description</h2>
-                <p className="text-muted-foreground leading-relaxed">{property.description}</p>
+              <section className="mb-12">
+                <h2 className="text-2xl font-editorial font-light text-gold mb-4 border-b border-zinc-800/30 pb-2">Description</h2>
+                <p className="text-muted-foreground leading-relaxed font-sans text-sm md:text-base">{property.description}</p>
               </section>
 
-              <section className="mb-8">
-                <h2 className="text-2xl font-headline font-semibold mb-4 border-b pb-2">Key Facts</h2>
+              <section className="mb-12">
+                <h2 className="text-2xl font-editorial font-light text-gold mb-4 border-b border-zinc-800/30 pb-2">Key Facts</h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
                   {keyFacts.map((fact) => (
-                    <div key={fact.label} className="flex items-start gap-3">
-                      <fact.icon className="w-6 h-6 text-primary mt-1" />
+                    <div key={fact.label} className="flex items-start gap-3 p-4 rounded-xl glass-panel border-zinc-800/20 card-glow">
+                      <fact.icon className="w-5 h-5 text-primary mt-0.5" />
                       <div>
-                        <p className="font-semibold text-foreground">{fact.label}</p>
-                        <p className={`text-muted-foreground ${fact.capitalize ? "capitalize" : ""}`}>{fact.value}</p>
+                        <p className="font-sans text-[10px] uppercase tracking-widest text-zinc-400 font-semibold">{fact.label}</p>
+                        <p className={`text-sm font-medium text-platinum mt-1 ${fact.capitalize ? "capitalize" : ""}`}>{fact.value}</p>
                       </div>
                     </div>
                   ))}
                 </div>
               </section>
 
-              <section className="mb-8">
-                <h2 className="text-2xl font-headline font-semibold mb-4 border-b pb-2">Amenities</h2>
-                <div className="flex flex-wrap gap-3">
+              <section className="mb-12">
+                <h2 className="text-2xl font-editorial font-light text-gold mb-4 border-b border-zinc-800/30 pb-2">Amenities</h2>
+                <div className="flex flex-wrap gap-2.5">
                   {property.amenities.map((amenity) => (
-                    <Badge key={amenity} variant="secondary" className="text-base py-1 px-3">
+                    <Badge key={amenity} variant="secondary" className="bg-white/5 border border-white/5 text-zinc-300 font-sans text-xs tracking-wider uppercase py-1.5 px-4 rounded-full">
                       {amenity}
                     </Badge>
                   ))}
                 </div>
               </section>
 
-              <section>
-                <h2 className="text-2xl font-headline font-semibold mb-4 border-b pb-2">Location</h2>
-                <div className="rounded-xl overflow-hidden border border-primary/20">
+              <section className="mb-12">
+                <h2 className="text-2xl font-editorial font-light text-gold mb-4 border-b border-zinc-800/30 pb-2">Location</h2>
+                <div className="rounded-2xl overflow-hidden border border-zinc-800/30 shadow-2xl">
                   <div ref={mapCallbackRef} className="w-full h-[350px] bg-zinc-900" />
                 </div>
-                <p className="text-sm text-muted-foreground mt-2 flex items-center gap-1.5">
+                <p className="text-[11px] font-sans tracking-wide text-zinc-400 mt-3 flex items-center gap-1.5">
                   <MapPin className="w-4 h-4 text-primary" />
-                  {property.location.locality}, {property.location.city}, {property.location.state}
+                  {property.location.locality}, <span className="text-gold">{property.location.city}</span>, {property.location.state}
                 </p>
               </section>
             </div>
 
             <aside className="lg:col-span-1 space-y-8 lg:sticky top-24 self-start">
-              <div className="p-6 bg-card border rounded-lg space-y-4">
+              <div className="p-6 glass-panel border-zinc-800/30 rounded-2xl space-y-6 card-glow">
                 <div>
-                  <p className="text-3xl font-bold text-foreground">
-                    ${(property.price || property.rentMonthly)?.toLocaleString()}
-                    {property.mode === "rent" && <span className="text-sm font-normal text-muted-foreground">/month</span>}
+                  <p className="font-sans text-[10px] uppercase tracking-widest text-zinc-400 font-semibold">Asking Price</p>
+                  <p className="text-4xl font-light font-sans tracking-tight text-platinum mt-1">
+                    <span className="rupee font-normal mr-0.5 text-zinc-400">₹</span>{(property.price || property.rentMonthly)?.toLocaleString()}
+                    {property.mode === "rent" && <span className="text-sm font-normal text-zinc-400">/month</span>}
                   </p>
-                  <p className="text-primary capitalize">For {property.mode}</p>
+                  <p className="text-xs text-primary font-sans font-bold tracking-widest uppercase mt-2">For {property.mode}</p>
                 </div>
-                <div className="flex flex-col gap-2">
-                  <Button size="lg">Contact Seller</Button>
+                <div className="flex flex-col gap-3 pt-2 border-t border-white/5">
+                  <Button size="lg" className="w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 font-medium">Contact Seller</Button>
                   <div className="flex gap-2">
                     <Button
-                      variant="secondary"
-                      className="w-full"
+                      variant="outline"
+                      className="w-full border-white/10 hover:bg-white/5 rounded-xl"
                       onClick={() => toggleSave(property.id)}
                     >
-                      <Heart className={`mr-2 ${saved ? "fill-red-500 text-red-500" : ""}`} /> {saved ? "Saved" : "Save"}
+                      <Heart className={cn("mr-2 h-4 w-4", saved ? "fill-red-500 text-red-500" : "")} /> {saved ? "Saved" : "Save"}
                     </Button>
-                    <Button variant="secondary" className="w-full">
-                      <Share2 className="mr-2" /> Share
+                    <Button variant="outline" className="w-full border-white/10 hover:bg-white/5 rounded-xl">
+                      <Share2 className="mr-2 h-4 w-4" /> Share
                     </Button>
                   </div>
                 </div>
@@ -341,9 +345,9 @@ export default function ListingDetailPage() {
 
     return (
       <AppLayout>
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 pt-24 pb-8 max-w-6xl relative bg-editorial-glow">
           <div className="mb-4">
-            <Link href="/discover" className="text-sm text-muted-foreground hover:text-primary inline-flex items-center gap-1">
+            <Link href="/discover" className="text-sm text-muted-foreground hover:text-primary inline-flex items-center gap-1 font-sans">
               <ArrowLeft className="w-4 h-4" /> Back to Discover
             </Link>
           </div>
@@ -378,21 +382,22 @@ export default function ListingDetailPage() {
             </div>
           )}
 
-          <header className="mb-8">
-            <div className="flex items-center gap-3 mb-2">
-              <Badge className="bg-emerald-500/20 text-emerald-400 border-0 text-xs font-bold uppercase tracking-wider">
+          <header className="mb-8 relative">
+            <div className="absolute -top-10 -left-10 w-72 h-72 bg-violet-500/5 rounded-full blur-[80px] pointer-events-none" />
+            <div className="flex items-center gap-2 mb-3">
+              <Badge className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[9px] font-sans font-bold tracking-widest uppercase py-1 rounded-full">
                 User Posted
               </Badge>
-              <Badge variant="secondary" className="text-xs uppercase tracking-wider capitalize">
+              <Badge variant="secondary" className="bg-white/5 border border-white/5 text-zinc-300 text-[9px] font-sans font-bold tracking-widest uppercase py-1 rounded-full capitalize">
                 {posted.propertyType}
               </Badge>
             </div>
-            <h1 className="text-4xl md:text-5xl font-headline font-bold text-foreground">{posted.title}</h1>
-            <p className="text-lg text-muted-foreground mt-2 flex items-center gap-2">
-              <MapPin className="w-5 h-5 text-primary" />
+            <h1 className="font-serif text-4xl font-light tracking-wide text-zinc-100 mb-2">{posted.title}</h1>
+            <p className="text-sm font-sans tracking-sans-wide uppercase text-zinc-400 mt-2 flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-primary" />
               {posted.state ? `${posted.state}, ${posted.city}` : ""}
               {posted.distanceFromTown > 0 && (
-                <span className="text-sm">
+                <span className="text-[11px] text-primary tracking-normal font-sans font-bold uppercase">
                   · {posted.distanceFromTown.toLocaleString()}m from {posted.nearestTownName}
                 </span>
               )}
@@ -423,34 +428,34 @@ export default function ListingDetailPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             <div className="lg:col-span-2">
               {posted.description && (
-                <section className="mb-8">
-                  <h2 className="text-2xl font-headline font-semibold mb-4 border-b pb-2">Description</h2>
-                  <p className="text-muted-foreground leading-relaxed">{posted.description}</p>
+                <section className="mb-12">
+                  <h2 className="text-2xl font-editorial font-light text-gold mb-4 border-b border-zinc-800/30 pb-2">Description</h2>
+                  <p className="text-muted-foreground leading-relaxed font-sans text-sm md:text-base">{posted.description}</p>
                 </section>
               )}
 
-              <section className="mb-8">
-                <h2 className="text-2xl font-headline font-semibold mb-4 border-b pb-2">Key Facts</h2>
+              <section className="mb-12">
+                <h2 className="text-2xl font-editorial font-light text-gold mb-4 border-b border-zinc-800/30 pb-2">Key Facts</h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
                   {keyFacts.map((fact) => (
-                    <div key={fact.label} className="flex items-start gap-3">
-                      <fact.icon className="w-6 h-6 text-emerald-500 mt-1" />
+                    <div key={fact.label} className="flex items-start gap-3 p-4 rounded-xl glass-panel border-zinc-800/20 card-glow">
+                      <fact.icon className="w-5 h-5 text-primary mt-0.5" />
                       <div>
-                        <p className="font-semibold text-foreground">{fact.label}</p>
-                        <p className="text-muted-foreground">{fact.value}</p>
+                        <p className="font-sans text-[10px] uppercase tracking-widest text-zinc-400 font-semibold">{fact.label}</p>
+                        <p className="text-sm font-medium text-platinum mt-1">{fact.value}</p>
                       </div>
                     </div>
                   ))}
                 </div>
               </section>
 
-              <section>
-                <h2 className="text-2xl font-headline font-semibold mb-4 border-b pb-2">Location</h2>
-                <div className="rounded-xl overflow-hidden border border-emerald-500/20">
+              <section className="mb-12">
+                <h2 className="text-2xl font-editorial font-light text-gold mb-4 border-b border-zinc-800/30 pb-2">Location</h2>
+                <div className="rounded-2xl overflow-hidden border border-zinc-800/30 shadow-2xl">
                   <div ref={mapCallbackRef} className="w-full h-[350px] bg-zinc-900" />
                 </div>
-                <p className="text-sm text-muted-foreground mt-2 flex items-center gap-1.5">
-                  <MapPin className="w-4 h-4 text-emerald-500" />
+                <p className="text-[11px] font-sans tracking-wide text-zinc-400 mt-3 flex items-center gap-1.5">
+                  <MapPin className="w-4 h-4 text-primary" />
                   {posted.state ? `${posted.state}, ${posted.city}` : ""}
                   {posted.distanceFromTown > 0 && <span> · {posted.distanceFromTown.toLocaleString()}m from {posted.nearestTownName}</span>}
                 </p>
@@ -458,42 +463,45 @@ export default function ListingDetailPage() {
             </div>
 
             <aside className="lg:col-span-1 space-y-8 lg:sticky top-24 self-start">
-              <div className="p-6 bg-card border border-emerald-500/20 rounded-lg space-y-4">
+              <div className="p-6 glass-panel border-zinc-800/30 rounded-2xl space-y-6 card-glow">
                 <div>
-                  <p className="text-3xl font-bold text-foreground">
+                  <p className="font-sans text-[10px] uppercase tracking-widest text-zinc-400 font-semibold">Total Price</p>
+                  <p className="text-4xl font-light font-sans tracking-tight text-platinum mt-1">
                     <span className="rupee">₹</span>{posted.totalPrice?.toLocaleString()}
                   </p>
                   {posted.pricePerCent > 0 && (
-                    <p className="text-sm text-muted-foreground"><span className="rupee">₹</span>{posted.pricePerCent.toLocaleString()} per cent</p>
+                    <p className="text-xs text-zinc-400 font-sans mt-1">
+                      <span className="rupee">₹</span>{posted.pricePerCent.toLocaleString()} per cent
+                    </p>
                   )}
-                  <p className="text-emerald-400 capitalize mt-1">For {posted.mode}</p>
+                  <p className="text-xs text-primary font-sans font-bold tracking-widest uppercase mt-2">For {posted.mode}</p>
                 </div>
-
+ 
                 {/* Contact details */}
-                <div className="space-y-3 pt-2 border-t border-white/10">
+                <div className="space-y-3 pt-4 border-t border-white/5">
                   {posted.contactName && (
-                    <div className="flex items-center gap-3 text-sm">
-                      <User className="w-4 h-4 text-emerald-500" />
-                      <span className="text-foreground font-semibold">{posted.contactName}</span>
+                    <div className="flex items-center gap-3 text-xs tracking-wide">
+                      <User className="w-3.5 h-3.5 text-primary" />
+                      <span className="text-zinc-300 font-medium">{posted.contactName}</span>
                     </div>
                   )}
                   {posted.contactPhone && (
-                    <a href={`tel:${posted.contactPhone}`} className="flex items-center gap-3 text-sm hover:text-emerald-400 transition-colors">
-                      <Phone className="w-4 h-4 text-emerald-500" />
+                    <a href={`tel:${posted.contactPhone}`} className="flex items-center gap-3 text-xs tracking-wide text-zinc-400 hover:text-primary transition-colors">
+                      <Phone className="w-3.5 h-3.5 text-primary" />
                       <span>{posted.contactPhone}</span>
                     </a>
                   )}
                   {posted.contactEmail && (
-                    <a href={`mailto:${posted.contactEmail}`} className="flex items-center gap-3 text-sm hover:text-emerald-400 transition-colors">
-                      <Mail className="w-4 h-4 text-emerald-500" />
+                    <a href={`mailto:${posted.contactEmail}`} className="flex items-center gap-3 text-xs tracking-wide text-zinc-400 hover:text-primary transition-colors">
+                      <Mail className="w-3.5 h-3.5 text-primary" />
                       <span>{posted.contactEmail}</span>
                     </a>
                   )}
                 </div>
-
-                <div className="flex flex-col gap-2">
+ 
+                <div className="flex flex-col gap-3 pt-2 border-t border-white/5">
                   {posted.contactPhone && (
-                    <Button size="lg" className="bg-emerald-600 hover:bg-emerald-500 w-full" asChild>
+                    <Button size="lg" className="w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 font-medium" asChild>
                       <a href={`tel:${posted.contactPhone}`}>
                         <Phone className="mr-2 w-4 h-4" /> Call Seller
                       </a>
@@ -501,15 +509,15 @@ export default function ListingDetailPage() {
                   )}
                   <div className="flex gap-2">
                     <Button
-                      variant="secondary"
-                      className="w-full"
+                      variant="outline"
+                      className="w-full border-white/10 hover:bg-white/5 rounded-xl"
                       onClick={() => toggleSave(posted.id)}
                     >
-                      <Heart className={`mr-2 ${isSaved(posted.id) ? "fill-red-500 text-red-500" : ""}`} />
+                      <Heart className={cn("mr-2 h-4 w-4", isSaved(posted.id) ? "fill-red-500 text-red-500" : "")} />
                       {isSaved(posted.id) ? "Saved" : "Save"}
                     </Button>
-                    <Button variant="secondary" className="w-full">
-                      <Share2 className="mr-2" /> Share
+                    <Button variant="outline" className="w-full border-white/10 hover:bg-white/5 rounded-xl">
+                      <Share2 className="mr-2 h-4 w-4" /> Share
                     </Button>
                   </div>
                 </div>

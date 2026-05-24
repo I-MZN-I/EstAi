@@ -57,9 +57,9 @@ const isLandType = (t: string) => /land|parking/i.test(t);
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex items-center gap-3 mb-4">
-      <span className="text-xs font-bold text-primary uppercase tracking-widest">{children}</span>
-      <div className="flex-1 h-px bg-border" />
+    <div className="flex items-center gap-3 mb-4 mt-2">
+      <span className="font-sans text-[10px] uppercase tracking-widest text-zinc-400 font-semibold">{children}</span>
+      <div className="flex-1 h-px bg-zinc-800/30" />
     </div>
   );
 }
@@ -141,28 +141,28 @@ export default function AIPage() {
 
   return (
     <AppLayout>
-      <div className="container mx-auto px-4 py-8 max-w-2xl">
+      <div className="container mx-auto px-4 pt-24 pb-8 max-w-2xl">
 
         {/* Header */}
         <header className="mb-8 text-center">
           <div className="inline-flex p-3 rounded-full bg-primary/10 mb-4">
             <Sparkles className="w-8 h-8 text-primary" />
           </div>
-          <h1 className="text-4xl font-headline font-bold text-foreground">
-            Est<span className="text-primary">Ai</span>{" "}
+          <h1 className="font-serif text-4xl font-light tracking-wide text-zinc-100">
+            Est<span className="italic text-primary">Ai</span>{" "}
             <span className="text-muted-foreground font-light text-lg">/ Price Estimator</span>
           </h1>
-          <p className="text-muted-foreground mt-2">
+          <p className="text-muted-foreground mt-2 text-sm font-sans">
             Enter property details — AI studies your live dataset to estimate a price range for any location.
           </p>
         </header>
 
         {/* Form */}
         {(!result || loading) && (
-          <Card className="bg-card border-primary/20 mb-8">
+          <Card className="bg-zinc-900/20 backdrop-blur-xl border border-zinc-800/25 rounded-2xl shadow-2xl mb-8">
             <CardHeader>
-              <CardTitle className="font-headline">Property Details</CardTitle>
-              <CardDescription>Provide the specifications for an AI-powered valuation.</CardDescription>
+              <CardTitle className="font-serif text-3xl font-light text-zinc-100 tracking-wide">Property Details</CardTitle>
+              <CardDescription className="font-sans text-xs text-zinc-400">Provide the specifications for an AI-powered valuation.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
 
@@ -171,12 +171,12 @@ export default function AIPage() {
                 <SectionTitle>Property</SectionTitle>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>Type</Label>
+                    <Label className="font-sans text-[10px] uppercase tracking-widest text-zinc-400 font-semibold">Type</Label>
                     <Select
                       value={form.propertyType}
                       onValueChange={(v) => set("propertyType", v)}
                     >
-                      <SelectTrigger><SelectValue placeholder="Select type" /></SelectTrigger>
+                      <SelectTrigger className="input-editorial-underline h-11 text-foreground border-b border-zinc-800/40"><SelectValue placeholder="Select type" /></SelectTrigger>
                       <SelectContent>
                         {PROPERTY_TYPES.map((t) => (
                           <SelectItem key={t} value={t}>{t}</SelectItem>
@@ -185,11 +185,12 @@ export default function AIPage() {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label>City / Town</Label>
+                    <Label className="font-sans text-[10px] uppercase tracking-widest text-zinc-400 font-semibold">City / Town</Label>
                     <Input
                       placeholder="Any city or town"
                       value={form.city ?? ""}
                       onChange={(e) => set("city", e.target.value)}
+                      className="input-editorial-underline h-11 text-foreground"
                     />
                     <p className="text-[10px] text-muted-foreground/70">
                       Any location — AI finds the nearest comparable market if not in dataset
@@ -203,20 +204,22 @@ export default function AIPage() {
                 <SectionTitle>Size</SectionTitle>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>Land Area (cents)</Label>
+                    <Label className="font-sans text-[10px] uppercase tracking-widest text-zinc-400 font-semibold">Land Area (cents)</Label>
                     <Input
                       type="number" min={0} placeholder="e.g. 8"
                       value={form.cent ?? ""}
                       onChange={(e) => set("cent", e.target.value ? Number(e.target.value) : undefined)}
+                      className="input-editorial-underline h-11 text-foreground"
                     />
                   </div>
                   {!landType && (
                     <div className="space-y-2">
-                      <Label>Built-up Area (sqft)</Label>
+                      <Label className="font-sans text-[10px] uppercase tracking-widest text-zinc-400 font-semibold">Built-up Area (sqft)</Label>
                       <Input
                         type="number" min={0} placeholder="e.g. 1500"
                         value={form.sqft ?? ""}
                         onChange={(e) => set("sqft", e.target.value ? Number(e.target.value) : undefined)}
+                        className="input-editorial-underline h-11 text-foreground"
                       />
                     </div>
                   )}
@@ -229,30 +232,33 @@ export default function AIPage() {
                   <SectionTitle>Building Details</SectionTitle>
                   <div className="grid grid-cols-3 gap-4 mb-4">
                     <div className="space-y-2">
-                      <Label>Bedrooms</Label>
+                      <Label className="font-sans text-[10px] uppercase tracking-widest text-zinc-400 font-semibold">Bedrooms</Label>
                       <Input type="number" min={1} max={20} placeholder="3"
                         value={form.bedroom ?? ""}
                         onChange={(e) => set("bedroom", e.target.value ? Number(e.target.value) : undefined)}
+                        className="input-editorial-underline h-11 text-foreground"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>Bathrooms</Label>
+                      <Label className="font-sans text-[10px] uppercase tracking-widest text-zinc-400 font-semibold">Bathrooms</Label>
                       <Input type="number" min={1} max={20} placeholder="2"
                         value={form.bathroom ?? ""}
                         onChange={(e) => set("bathroom", e.target.value ? Number(e.target.value) : undefined)}
+                        className="input-editorial-underline h-11 text-foreground"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>Floors</Label>
+                      <Label className="font-sans text-[10px] uppercase tracking-widest text-zinc-400 font-semibold">Floors</Label>
                       <Input type="number" min={1} max={50} placeholder="2"
                         value={form.totalFloors ?? ""}
                         onChange={(e) => set("totalFloors", e.target.value ? Number(e.target.value) : undefined)}
+                        className="input-editorial-underline h-11 text-foreground"
                       />
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Furnished Status</Label>
+                    <Label className="font-sans text-[10px] uppercase tracking-widest text-zinc-400 font-semibold">Furnished Status</Label>
                     <div className="flex gap-2 mt-0.5">
                       {FURNISHED_OPTIONS.map((o) => (
                         <Button
@@ -275,19 +281,20 @@ export default function AIPage() {
                 <SectionTitle>Location</SectionTitle>
                 <div className="grid grid-cols-2 gap-4 mb-4">
                   <div className="space-y-2">
-                    <Label>Distance from Town (metres)</Label>
+                    <Label className="font-sans text-[10px] uppercase tracking-widest text-zinc-400 font-semibold">Distance from Town (metres)</Label>
                     <Input type="number" min={0} placeholder="500"
                       value={form.distanceFromTown ?? ""}
                       onChange={(e) => set("distanceFromTown", Number(e.target.value))}
+                      className="input-editorial-underline h-11 text-foreground"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Road Facility</Label>
+                    <Label className="font-sans text-[10px] uppercase tracking-widest text-zinc-400 font-semibold">Road Facility</Label>
                     <Select
                       value={form.roadFacility ?? ""}
                       onValueChange={(v) => set("roadFacility", v || undefined)}
                     >
-                      <SelectTrigger><SelectValue placeholder="Not specified" /></SelectTrigger>
+                      <SelectTrigger className="input-editorial-underline h-11 text-foreground border-b border-zinc-800/40"><SelectValue placeholder="Not specified" /></SelectTrigger>
                       <SelectContent>
                         {ROAD_OPTIONS.map((o) => (
                           <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
@@ -297,12 +304,12 @@ export default function AIPage() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label>Nearest Landmark Type</Label>
+                  <Label className="font-sans text-[10px] uppercase tracking-widest text-zinc-400 font-semibold">Nearest Landmark Type</Label>
                   <Select
                     value={form.nearestLandmarkType ?? ""}
                     onValueChange={(v) => set("nearestLandmarkType", v || undefined)}
                   >
-                    <SelectTrigger><SelectValue placeholder="Not specified" /></SelectTrigger>
+                    <SelectTrigger className="input-editorial-underline h-11 text-foreground border-b border-zinc-800/40"><SelectValue placeholder="Not specified" /></SelectTrigger>
                     <SelectContent>
                       {LANDMARK_TYPES.map((l) => (
                         <SelectItem key={l} value={l.toLowerCase()}>{l}</SelectItem>
@@ -316,10 +323,11 @@ export default function AIPage() {
               <div>
                 <SectionTitle>Income</SectionTitle>
                 <div className="space-y-2">
-                  <Label>Monthly Rental Income (<span className="rupee">₹</span>) — enter 0 if none</Label>
+                  <Label className="font-sans text-[10px] uppercase tracking-widest text-zinc-400 font-semibold">Monthly Rental Income (<span className="rupee">₹</span>) — enter 0 if none</Label>
                   <Input type="number" min={0} placeholder="0"
                     value={form.monthlyIncome ?? 0}
                     onChange={(e) => set("monthlyIncome", Number(e.target.value))}
+                    className="input-editorial-underline h-11 text-foreground"
                   />
                 </div>
               </div>

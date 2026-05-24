@@ -94,11 +94,11 @@ const mapStyle = [
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex items-center gap-3 mb-4">
-      <span className="text-xs font-bold text-primary uppercase tracking-widest">
+    <div className="flex items-center gap-3 mb-4 mt-2">
+      <span className="font-sans text-[10px] uppercase tracking-widest text-zinc-400 font-semibold">
         {children}
       </span>
-      <div className="flex-1 h-px bg-border" />
+      <div className="flex-1 h-px bg-zinc-800/30" />
     </div>
   );
 }
@@ -115,29 +115,39 @@ function StepIndicator({
   labels: string[];
 }) {
   return (
-    <div className="flex items-center justify-center gap-2 mb-8">
+    <div className="flex items-center justify-center gap-4 mb-12">
       {Array.from({ length: totalSteps }, (_, i) => (
-        <div key={i} className="flex items-center gap-2">
-          <div
-            className={cn(
-              "flex items-center justify-center w-9 h-9 rounded-full text-sm font-bold transition-all duration-300",
-              i < currentStep
-                ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30"
-                : i === currentStep
-                  ? "bg-primary/20 text-primary border-2 border-primary animate-pulse"
-                  : "bg-white/5 text-muted-foreground border border-white/10"
+        <div key={i} className="flex items-center gap-4">
+          <div className="relative flex items-center justify-center">
+            {/* Active expansion ring */}
+            {i === currentStep && (
+              <motion.div
+                layoutId="step-expansion-ring"
+                className="absolute -inset-1.5 rounded-full border border-primary/45"
+                transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              />
             )}
-          >
-            {i < currentStep ? (
-              <CheckCircle2 className="w-5 h-5" />
-            ) : (
-              i + 1
-            )}
+            <div
+              className={cn(
+                "flex items-center justify-center w-8 h-8 rounded-full text-xs font-semibold font-sans transition-all duration-500 relative z-10",
+                i < currentStep
+                  ? "bg-primary text-primary-foreground"
+                  : i === currentStep
+                    ? "bg-primary/10 text-primary border border-primary"
+                    : "bg-white/5 text-muted-foreground border border-white/5"
+              )}
+            >
+              {i < currentStep ? (
+                <CheckCircle2 className="w-4 h-4" />
+              ) : (
+                i + 1
+              )}
+            </div>
           </div>
           <span
             className={cn(
-              "text-[10px] font-bold uppercase tracking-wider hidden sm:block",
-              i <= currentStep ? "text-primary" : "text-muted-foreground/50"
+              "text-[9px] font-sans font-bold tracking-widest uppercase hidden md:block",
+              i === currentStep ? "text-primary text-glow" : i < currentStep ? "text-zinc-300" : "text-muted-foreground/30"
             )}
           >
             {labels[i]}
@@ -145,8 +155,8 @@ function StepIndicator({
           {i < totalSteps - 1 && (
             <div
               className={cn(
-                "w-8 h-0.5 rounded-full",
-                i < currentStep ? "bg-primary" : "bg-white/10"
+                "w-12 h-[1px]",
+                i < currentStep ? "bg-primary" : "bg-white/5"
               )}
             />
           )}
@@ -712,16 +722,16 @@ export default function PostPropertyPage() {
 
   return (
     <AppLayout>
-      <div className="container mx-auto px-4 py-8 max-w-2xl">
+      <div className="container mx-auto px-6 pt-24 pb-24 max-w-2xl">
         {/* Header */}
-        <header className="mb-6 text-center">
-          <div className="inline-flex p-3 rounded-full bg-primary/10 mb-4">
+        <header className="mb-10 text-center">
+          <div className="inline-flex p-4 rounded-full bg-primary/10 mb-5 border border-primary/25 shadow-lg shadow-primary/5">
             <Upload className="w-8 h-8 text-primary" />
           </div>
-          <h1 className="text-4xl font-headline font-bold text-foreground">
-            {isEditMode ? "Edit" : "Post"} <span className="text-primary">Property</span>
+          <h1 className="font-serif text-4xl font-light tracking-wide text-zinc-100 text-glow">
+            {isEditMode ? "Edit" : "Post"} <span className="italic text-primary">Property</span>
           </h1>
-          <p className="text-muted-foreground mt-2">
+          <p className="text-muted-foreground text-sm font-sans mt-2">
             {isEditMode ? "Update your property details" : "List your property for sale or rent on EstAi"}
           </p>
         </header>
@@ -734,12 +744,12 @@ export default function PostPropertyPage() {
             initial={{ x: 40, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: -40, opacity: 0 }}
-            transition={{ duration: 0.25 }}
+            transition={{ type: "spring", stiffness: 300, damping: 25 }}
           >
-            <Card className="bg-card border-primary/20 mb-6">
-              <CardHeader>
-                <CardTitle className="font-headline">{STEP_LABELS[step]}</CardTitle>
-                <CardDescription>
+            <Card className="bg-zinc-900/20 backdrop-blur-xl border border-zinc-800/25 rounded-2xl shadow-2xl mb-8">
+              <CardHeader className="pb-4">
+                <CardTitle className="font-serif text-3xl font-light text-zinc-100 tracking-wide">{STEP_LABELS[step]}</CardTitle>
+                <CardDescription className="font-sans text-xs">
                   {step === 0 && "Basic property information"}
                   {step === 1 && "Property features, pricing & contact"}
                   {step === 2 && "Pin your property on the map"}
@@ -797,17 +807,18 @@ export default function PostPropertyPage() {
                       <SectionTitle>Basic Info</SectionTitle>
                       <div className="space-y-4">
                         <div className="space-y-2">
-                          <Label>Property Title *</Label>
+                          <Label className="font-sans text-[10px] uppercase tracking-widest text-zinc-400 font-semibold">Property Title *</Label>
                           <Input
                             placeholder="e.g. Beautiful 3BHK House in Thrissur"
                             value={form.title}
                             onChange={(e) => set("title", e.target.value)}
+                            className="input-editorial-underline h-11 text-foreground"
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label>Description</Label>
+                          <Label className="font-sans text-[10px] uppercase tracking-widest text-zinc-400 font-semibold">Description</Label>
                           <textarea
-                            className="w-full min-h-[100px] rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none"
+                            className="w-full min-h-[100px] input-editorial-underline resize-none text-foreground py-2 text-sm"
                             placeholder="Describe your property..."
                             value={form.description}
                             onChange={(e) => set("description", e.target.value)}
@@ -826,7 +837,7 @@ export default function PostPropertyPage() {
                         <SectionTitle>Building Features</SectionTitle>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-4">
                           <div className="space-y-2">
-                            <Label>Bedrooms</Label>
+                            <Label className="font-sans text-[10px] uppercase tracking-widest text-zinc-400 font-semibold">Bedrooms</Label>
                             <Input
                               type="number"
                               min={0}
@@ -834,10 +845,11 @@ export default function PostPropertyPage() {
                               value={form.bedrooms || ""}
                               onChange={(e) => set("bedrooms", Number(e.target.value))}
                               placeholder="3"
+                              className="input-editorial-underline h-11 text-foreground"
                             />
                           </div>
                           <div className="space-y-2">
-                            <Label>Bathrooms</Label>
+                            <Label className="font-sans text-[10px] uppercase tracking-widest text-zinc-400 font-semibold">Bathrooms</Label>
                             <Input
                               type="number"
                               min={0}
@@ -845,11 +857,12 @@ export default function PostPropertyPage() {
                               value={form.bathrooms || ""}
                               onChange={(e) => set("bathrooms", Number(e.target.value))}
                               placeholder="2"
+                              className="input-editorial-underline h-11 text-foreground"
                             />
                           </div>
                           {/commercial/i.test(form.propertyType) && (
                             <div className="space-y-2">
-                              <Label>Rooms</Label>
+                              <Label className="font-sans text-[10px] uppercase tracking-widest text-zinc-400 font-semibold">Rooms</Label>
                               <Input
                                 type="number"
                                 min={0}
@@ -857,11 +870,12 @@ export default function PostPropertyPage() {
                                 value={form.rooms || ""}
                                 onChange={(e) => set("rooms", Number(e.target.value))}
                                 placeholder="8"
+                                className="input-editorial-underline h-11 text-foreground"
                               />
                             </div>
                           )}
                           <div className="space-y-2">
-                            <Label>Total Floors</Label>
+                            <Label className="font-sans text-[10px] uppercase tracking-widest text-zinc-400 font-semibold">Total Floors</Label>
                             <Input
                               type="number"
                               min={1}
@@ -869,12 +883,13 @@ export default function PostPropertyPage() {
                               value={form.totalFloors || ""}
                               onChange={(e) => set("totalFloors", Number(e.target.value))}
                               placeholder="2"
+                              className="input-editorial-underline h-11 text-foreground"
                             />
                           </div>
                         </div>
 
                         <div className="space-y-2 mb-4">
-                          <Label>Furnished Status</Label>
+                          <Label className="font-sans text-[10px] uppercase tracking-widest text-zinc-400 font-semibold">Furnished Status</Label>
                           <div className="flex gap-2">
                             {FURNISHED_OPTIONS.map((o) => (
                               <Button
@@ -899,7 +914,7 @@ export default function PostPropertyPage() {
                       <SectionTitle>Size</SectionTitle>
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label>Property Area (cents)</Label>
+                          <Label className="font-sans text-[10px] uppercase tracking-widest text-zinc-400 font-semibold">Property Area (cents)</Label>
                           <Input
                             type="number"
                             min={0}
@@ -907,17 +922,19 @@ export default function PostPropertyPage() {
                             value={form.cent || ""}
                             onChange={(e) => set("cent", Number(e.target.value))}
                             placeholder="8"
+                            className="input-editorial-underline h-11 text-foreground"
                           />
                         </div>
                         {!landType && (
                           <div className="space-y-2">
-                            <Label>Built-up Area (sqft)</Label>
+                            <Label className="font-sans text-[10px] uppercase tracking-widest text-zinc-400 font-semibold">Built-up Area (sqft)</Label>
                             <Input
                               type="number"
                               min={0}
                               value={form.sqft || ""}
                               onChange={(e) => set("sqft", Number(e.target.value))}
                               placeholder="1500"
+                              className="input-editorial-underline h-11 text-foreground"
                             />
                           </div>
                         )}
@@ -928,38 +945,41 @@ export default function PostPropertyPage() {
                       <SectionTitle>Location Details</SectionTitle>
                       <div className="grid grid-cols-2 gap-4 mb-4">
                         <div className="space-y-2">
-                          <Label>City</Label>
+                          <Label className="font-sans text-[10px] uppercase tracking-widest text-zinc-400 font-semibold">City</Label>
                           <Input
                             placeholder="e.g. Thrissur"
                             value={form.city}
                             onChange={(e) => set("city", e.target.value)}
+                            className="input-editorial-underline h-11 text-foreground"
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label>State</Label>
+                          <Label className="font-sans text-[10px] uppercase tracking-widest text-zinc-400 font-semibold">State</Label>
                           <Input
                             placeholder="e.g. Kerala"
                             value={form.state}
                             onChange={(e) => set("state", e.target.value)}
+                            className="input-editorial-underline h-11 text-foreground"
                           />
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-4 mb-4">
                         <div className="space-y-2">
-                          <Label>Nearest Landmark</Label>
+                          <Label className="font-sans text-[10px] uppercase tracking-widest text-zinc-400 font-semibold">Nearest Landmark</Label>
                           <Input
                             placeholder="e.g. St. Mary's Church"
                             value={form.nearestLandmark}
                             onChange={(e) => set("nearestLandmark", e.target.value)}
+                            className="input-editorial-underline h-11 text-foreground"
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label>Road Facility</Label>
+                          <Label className="font-sans text-[10px] uppercase tracking-widest text-zinc-400 font-semibold">Road Facility</Label>
                           <Select
                             value={form.roadFacility}
                             onValueChange={(v) => set("roadFacility", v)}
                           >
-                            <SelectTrigger>
+                            <SelectTrigger className="input-editorial-underline h-11 text-foreground border-b border-white/8">
                               <SelectValue placeholder="Select road type" />
                             </SelectTrigger>
                             <SelectContent>
@@ -981,7 +1001,7 @@ export default function PostPropertyPage() {
                       <div className="mb-6 bg-zinc-900 border border-primary/20 rounded-xl p-5 shadow-lg">
                         <div className="flex flex-col sm:flex-row items-baseline gap-4 mb-4">
                           <div className="flex-1">
-                            <h3 className="text-sm font-bold text-foreground">AI Price Recommendation</h3>
+                            <h3 className="font-serif text-2xl font-light tracking-wide text-zinc-100">AI Price Recommendation</h3>
                             <p className="text-xs text-muted-foreground mt-1">
                               Get a data-driven price estimate based on your property details and market trends.
                             </p>
@@ -1037,23 +1057,25 @@ export default function PostPropertyPage() {
                       {/* ----------------------------- */}
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label>Total Asking Price (<span className="rupee">₹</span>)</Label>
+                          <Label className="font-sans text-[10px] uppercase tracking-widest text-zinc-400 font-semibold">Total Asking Price (<span className="rupee">₹</span>)</Label>
                           <Input
                             type="number"
                             min={0}
                             value={form.totalPrice || ""}
                             onChange={(e) => set("totalPrice", Number(e.target.value))}
                             placeholder="5000000"
+                            className="input-editorial-underline h-11 text-foreground"
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label>Price per Cent (<span className="rupee">₹</span>)</Label>
+                          <Label className="font-sans text-[10px] uppercase tracking-widest text-zinc-400 font-semibold">Price per Cent (<span className="rupee">₹</span>)</Label>
                           <Input
                             type="number"
                             min={0}
                             value={form.pricePerCent || ""}
                             onChange={(e) => set("pricePerCent", Number(e.target.value))}
                             placeholder="600000"
+                            className="input-editorial-underline h-11 text-foreground"
                           />
                         </div>
                       </div>
@@ -1063,29 +1085,32 @@ export default function PostPropertyPage() {
                       <SectionTitle>Contact Details</SectionTitle>
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div className="space-y-2">
-                          <Label>Seller Name</Label>
+                          <Label className="font-sans text-[10px] uppercase tracking-widest text-zinc-400 font-semibold">Seller Name</Label>
                           <Input
                             placeholder="Full name"
                             value={form.contactName}
                             onChange={(e) => set("contactName", e.target.value)}
+                            className="input-editorial-underline h-11 text-foreground"
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label>Phone Number</Label>
+                          <Label className="font-sans text-[10px] uppercase tracking-widest text-zinc-400 font-semibold">Phone Number</Label>
                           <Input
                             type="tel"
                             placeholder="+91 XXXXX XXXXX"
                             value={form.contactPhone}
                             onChange={(e) => set("contactPhone", e.target.value)}
+                            className="input-editorial-underline h-11 text-foreground"
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label>Email</Label>
+                          <Label className="font-sans text-[10px] uppercase tracking-widest text-zinc-400 font-semibold">Email</Label>
                           <Input
                             type="email"
                             placeholder="email@example.com"
                             value={form.contactEmail}
                             onChange={(e) => set("contactEmail", e.target.value)}
+                            className="input-editorial-underline h-11 text-foreground"
                           />
                         </div>
                       </div>
@@ -1108,7 +1133,7 @@ export default function PostPropertyPage() {
                         ref={searchInputRef}
                         type="text"
                         placeholder="Search for a place or address..."
-                        className="w-full h-11 pl-10 pr-4 rounded-xl border border-primary/20 bg-white/5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 transition-all"
+                        className="w-full h-11 pl-10 pr-4 input-editorial-underline text-foreground text-sm focus:border-b-violet-500/70"
                       />
                     </div>
 
@@ -1196,11 +1221,12 @@ export default function PostPropertyPage() {
                         </div>
                       ))}
                       <button
+                        type="button"
                         onClick={() => fileInputRef.current?.click()}
-                        className="aspect-video rounded-xl border-2 border-dashed border-primary/30 flex flex-col items-center justify-center gap-2 text-primary hover:bg-primary/5 hover:border-primary/50 transition-all"
+                        className="aspect-video rounded-xl border border-dashed border-primary/30 bg-white/5 flex flex-col items-center justify-center gap-2 text-primary hover:bg-primary/5 hover:border-primary/50 transition-all shadow-[inset_0_1px_1px_rgba(255,255,255,0.02)]"
                       >
                         <ImagePlus className="w-8 h-8" />
-                        <span className="text-xs font-bold">Add Photos</span>
+                        <span className="text-xs font-sans font-bold tracking-sans-wide uppercase">Add Photos</span>
                       </button>
                     </div>
                   </div>

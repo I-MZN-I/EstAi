@@ -19,83 +19,62 @@ import type { Property } from "@/lib/types";
 
 // Dark mode style for Google Maps to match the EstAi lavender/black theme
 const mapStyle = [
-  { elementType: "geometry", stylers: [{ color: "#1a1a1a" }] },
-  { elementType: "labels.text.stroke", stylers: [{ color: "#1a1a1a" }] },
-  { elementType: "labels.text.fill", stylers: [{ color: "#a78bfa" }] },
+  { elementType: "geometry", stylers: [{ color: "#09090b" }] },
+  { elementType: "labels.text.stroke", stylers: [{ color: "#09090b" }, { weight: 2 }] },
+  { elementType: "labels.text.fill", stylers: [{ color: "#78716c" }] },
+  {
+    featureType: "administrative",
+    elementType: "geometry",
+    stylers: [{ color: "#1e1e24" }],
+  },
   {
     featureType: "administrative.locality",
     elementType: "labels.text.fill",
-    stylers: [{ color: "#c4b5fd" }],
+    stylers: [{ color: "#a8a29e" }],
   },
   {
     featureType: "poi",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#a78bfa" }],
-  },
-  {
-    featureType: "poi.park",
-    elementType: "geometry",
-    stylers: [{ color: "#111111" }],
-  },
-  {
-    featureType: "poi.park",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#7c3aed" }],
+    stylers: [{ visibility: "off" }],
   },
   {
     featureType: "road",
     elementType: "geometry",
-    stylers: [{ color: "#2d2d2d" }],
+    stylers: [{ color: "#16161a" }],
   },
   {
     featureType: "road",
     elementType: "geometry.stroke",
-    stylers: [{ color: "#1a1a1a" }],
+    stylers: [{ color: "#242427" }],
   },
   {
     featureType: "road",
     elementType: "labels.text.fill",
-    stylers: [{ color: "#666666" }],
+    stylers: [{ color: "#52525b" }],
   },
   {
     featureType: "road.highway",
     elementType: "geometry",
-    stylers: [{ color: "#4c1d95" }],
+    stylers: [{ color: "#1f1f23" }],
   },
   {
     featureType: "road.highway",
     elementType: "geometry.stroke",
-    stylers: [{ color: "#1e1b4b" }],
-  },
-  {
-    featureType: "road.highway",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#ddd6fe" }],
+    stylers: [{ color: "#2d2d30" }],
   },
   {
     featureType: "transit",
     elementType: "geometry",
-    stylers: [{ color: "#2d2d2d" }],
-  },
-  {
-    featureType: "transit.station",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#a78bfa" }],
+    stylers: [{ color: "#16161a" }],
   },
   {
     featureType: "water",
     elementType: "geometry",
-    stylers: [{ color: "#000000" }],
+    stylers: [{ color: "#0b0f19" }],
   },
   {
     featureType: "water",
     elementType: "labels.text.fill",
-    stylers: [{ color: "#333333" }],
-  },
-  {
-    featureType: "water",
-    elementType: "labels.text.stroke",
-    stylers: [{ color: "#000000" }],
+    stylers: [{ color: "#3f3f46" }],
   },
 ];
 
@@ -145,19 +124,16 @@ export default function MapPage() {
           mapId: 'DEMO_MAP_ID',
           styles: mapStyle,
           disableDefaultUI: true,
-          backgroundColor: '#000000',
+          backgroundColor: '#09090b',
         });
 
         // Placeholder property markers
         properties.forEach((property) => {
           const pinContainer = document.createElement('div');
-          pinContainer.className = "flex flex-col items-center group cursor-pointer";
+          pinContainer.className = "cursor-pointer scale-90 hover:scale-105 transition-transform duration-300";
           pinContainer.innerHTML = `
-            <div class="bg-black/90 text-primary text-[10px] font-bold px-2 py-1 rounded-full border border-primary/30 mb-1 group-hover:bg-primary group-hover:text-primary-foreground transition-all shadow-lg">
-              $${(property.price || property.rentMonthly)?.toLocaleString()}
-            </div>
-            <div class="bg-primary/20 text-primary p-2 rounded-full backdrop-blur-md border border-primary/40 group-hover:bg-primary group-hover:text-primary-foreground transition-all shadow-primary/20 shadow-lg">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+            <div class="bg-zinc-950/90 text-primary text-[11px] font-sans font-semibold px-3 py-1.5 rounded-full border border-primary/30 shadow-lg shadow-black/80 whitespace-nowrap">
+              ₹${(property.price || property.rentMonthly)?.toLocaleString()}
             </div>
           `;
 
@@ -182,13 +158,10 @@ export default function MapPage() {
           if (!pLat || !pLng) return;
 
           const pinContainer = document.createElement('div');
-          pinContainer.className = "flex flex-col items-center group cursor-pointer";
+          pinContainer.className = "cursor-pointer scale-90 hover:scale-105 transition-transform duration-300";
           pinContainer.innerHTML = `
-            <div class="bg-emerald-900/90 text-emerald-400 text-[10px] font-bold px-2 py-1 rounded-full border border-emerald-500/30 mb-1 group-hover:bg-emerald-500 group-hover:text-white transition-all shadow-lg">
-              <span style="font-family: system-ui, -apple-system, 'Segoe UI', sans-serif">₹</span>${posted.totalPrice?.toLocaleString()}
-            </div>
-            <div class="bg-emerald-500/20 text-emerald-400 p-2 rounded-full backdrop-blur-md border border-emerald-500/40 group-hover:bg-emerald-500 group-hover:text-white transition-all shadow-emerald-500/20 shadow-lg">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+            <div class="bg-zinc-950/90 text-emerald-400 text-[11px] font-sans font-semibold px-3 py-1.5 rounded-full border border-emerald-500/30 shadow-lg shadow-black/80 whitespace-nowrap">
+              ₹${posted.totalPrice?.toLocaleString()}
             </div>
           `;
 
@@ -224,7 +197,7 @@ export default function MapPage() {
 
   return (
     <AppLayout>
-      <div className="relative h-[calc(100vh-64px)] w-full overflow-hidden bg-zinc-950">
+      <div className="relative h-[calc(100vh-64px)] w-full overflow-hidden bg-zinc-950 mt-16">
         {/* Search Overlay */}
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 w-full max-w-md px-4">
           <div className="relative group">
@@ -328,7 +301,7 @@ export default function MapPage() {
                       </p>
                       <div className="flex items-center gap-1.5 text-[10px] font-bold text-primary">
                         <Zap className="h-3 w-3 fill-primary" />
-                        AI ESTIMATE: ${((selectedProperty.price || selectedProperty.rentMonthly)! * 1.05).toLocaleString()}
+                        AI ESTIMATE: <span className="rupee font-normal mr-0.5 text-zinc-400">₹</span>{((selectedProperty.price || selectedProperty.rentMonthly)! * 1.05).toLocaleString()}
                       </div>
                     </div>
                   </div>

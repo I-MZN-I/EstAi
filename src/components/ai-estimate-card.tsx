@@ -93,9 +93,9 @@ export function AIEstimateCard({ property }: AIEstimateCardProps) {
 
   return (
     <>
-      <Card className="bg-card border-primary/20">
+      <Card className="bg-zinc-900/40 backdrop-blur-md border border-zinc-800/30 rounded-2xl card-glow">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 font-headline">
+          <CardTitle className="flex items-center gap-2 font-editorial font-light text-2xl text-gold">
             <Zap className="h-6 w-6 text-primary" />
             AI Price Estimation
           </CardTitle>
