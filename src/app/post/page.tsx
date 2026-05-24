@@ -171,10 +171,7 @@ function StepIndicator({
 export default function PostPropertyPage() {
   const auth = useAuth();
   const router = useRouter();
-  const { addProperty, updateProperty, postedProperties } = usePostedProperties();
-  const { toast } = useToast();
   const { user, isUserLoading } = useUser();
-  const searchParams = useSearchParams();
 
   if (isUserLoading) {
     return (
@@ -189,30 +186,40 @@ export default function PostPropertyPage() {
     );
   }
 
-  if (!auth.currentUser || !user) {
+  // Force an immediate authentication bailout return
+  if (!auth || !auth.currentUser) {
     return (
       <AppLayout>
-        <div className="min-h-screen w-full bg-[#060608] pt-32 pb-12 flex flex-col items-center justify-start px-4 relative">
-          <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-80 h-80 bg-violet-500/5 rounded-full blur-[90px] pointer-events-none" />
-          <div className="w-full max-w-md p-10 bg-zinc-900/10 backdrop-blur-2xl border border-zinc-900/60 rounded-2xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7)] text-center animate-in fade-in duration-500">
-            <div className="inline-flex p-4 rounded-full bg-primary/10 mb-4 border border-primary/20">
-              <Upload className="w-10 h-10 text-primary" />
+        <div className="min-h-screen w-full bg-[#060608] pt-32 pb-12 flex flex-col items-center justify-start px-4">
+          <div className="w-full max-w-md p-10 bg-zinc-900/10 backdrop-blur-2xl border border-zinc-900/60 rounded-2xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7)] text-center">
+            {/* Standardized Sign In Required Layout Content */}
+            <div className="inline-flex items-center justify-center h-12 w-12 rounded-full bg-zinc-900/40 border border-zinc-800/80 text-violet-400 mb-4">
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+              </svg>
             </div>
-            <h2 className="font-serif text-3xl font-light text-zinc-200 mt-6 mb-2 text-glow">Sign In Required</h2>
+            <h1 className="font-serif text-3xl font-light text-zinc-200 mt-4 mb-2">Sign In Required</h1>
             <p className="font-sans text-xs text-zinc-400 tracking-wide max-w-xs mx-auto mb-8 leading-relaxed">
               Please sign in to access the digital listing engine and broadcast your architectural spaces.
             </p>
-            <Button
-              className="w-full bg-violet-600 text-white hover:bg-violet-700 font-sans text-xs uppercase tracking-widest transition-all duration-300 py-4 rounded-xl font-semibold"
-              onClick={() => router.push("/login")}
-            >
-              Sign In / Register
-            </Button>
+            <button onClick={() => router.push('/login')} className="w-full bg-violet-600 text-white hover:bg-violet-700 font-sans text-xs uppercase tracking-widest transition-all duration-300 py-4 rounded-xl font-semibold">
+              SIGN IN / REGISTER
+            </button>
           </div>
         </div>
       </AppLayout>
     );
   }
+
+  return <PostPropertyForm user={user} />;
+}
+
+function PostPropertyForm({ user }: { user: any }) {
+  const auth = useAuth();
+  const router = useRouter();
+  const { addProperty, updateProperty, postedProperties } = usePostedProperties();
+  const { toast } = useToast();
+  const searchParams = useSearchParams();
 
   const editId = searchParams.get("edit");
   const editingProperty = editId ? postedProperties.find((p) => p.id === editId) : null;
