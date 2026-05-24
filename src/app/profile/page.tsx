@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Logo } from "@/components/logo";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth, useUser } from "@/firebase";
 import { signOut, updateProfile } from "firebase/auth";
@@ -70,24 +69,26 @@ export default function ProfilePage() {
     }
 
     // Not signed in — redirect to login
-    if (!user) {
+    if (!auth.currentUser || !user) {
         return (
             <AppLayout>
-                <div className="flex items-center justify-center min-h-[60vh] relative bg-editorial-glow">
-                    <Card className="mx-auto max-w-sm w-full bg-zinc-900/40 backdrop-blur-md border border-zinc-800/30 rounded-2xl text-center card-glow animate-in fade-in duration-500">
-                        <CardHeader>
-                            <Logo className="text-4xl justify-center mb-4" />
-                            <CardTitle className="font-editorial font-light text-2xl tracking-tight text-gold">Sign In Required</CardTitle>
-                            <CardDescription className="font-sans text-xs text-zinc-400">
-                                Please sign in to view your profile
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <Button className="w-full rounded-xl bg-primary text-primary-foreground font-medium" onClick={() => router.push("/login")}>
-                                Sign In / Create Account
-                            </Button>
-                        </CardContent>
-                    </Card>
+                <div className="min-h-screen w-full bg-[#060608] pt-32 pb-12 flex flex-col items-center justify-start px-4 relative">
+                    <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-80 h-80 bg-violet-500/5 rounded-full blur-[90px] pointer-events-none" />
+                    <div className="w-full max-w-md p-10 bg-zinc-900/10 backdrop-blur-2xl border border-zinc-900/60 rounded-2xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7)] text-center animate-in fade-in duration-500">
+                        <div className="inline-flex p-4 rounded-full bg-primary/10 mb-4 border border-primary/20">
+                            <User className="w-10 h-10 text-primary" />
+                        </div>
+                        <h2 className="font-serif text-3xl font-light text-zinc-200 mt-6 mb-2 text-glow">Sign In Required</h2>
+                        <p className="font-sans text-xs text-zinc-400 tracking-wide max-w-xs mx-auto mb-8 leading-relaxed">
+                            Please sign in to view and manage your custom profile portfolio.
+                        </p>
+                        <Button
+                            className="w-full bg-violet-600 text-white hover:bg-violet-700 font-sans text-xs uppercase tracking-widest transition-all duration-300 py-4 rounded-xl font-semibold"
+                            onClick={() => router.push("/login")}
+                        >
+                            Sign In / Register
+                        </Button>
+                    </div>
                 </div>
             </AppLayout>
         );
