@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { useSearchParams } from "next/navigation";
-import { useUser } from "@/firebase";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useAuth, useUser } from "@/firebase";
 import { db } from "@/firebase/config";
 import { collection, doc, setDoc, addDoc, serverTimestamp } from "firebase/firestore";
 import { AppLayout } from "@/components/layout/app-layout";
@@ -169,10 +169,51 @@ function StepIndicator({
 // ─── Main Page ───────────────────────────────────────────────────────────────
 
 export default function PostPropertyPage() {
+  const auth = useAuth();
+  const router = useRouter();
   const { addProperty, updateProperty, postedProperties } = usePostedProperties();
   const { toast } = useToast();
-  const { user } = useUser();
+  const { user, isUserLoading } = useUser();
   const searchParams = useSearchParams();
+
+  if (isUserLoading) {
+    return (
+      <AppLayout>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+            <p className="text-muted-foreground text-sm font-sans">Connecting to your account...</p>
+          </div>
+        </div>
+      </AppLayout>
+    );
+  }
+
+  if (!auth.currentUser || !user) {
+    return (
+      <AppLayout>
+        <div className="min-h-screen w-full bg-[#060608] pt-32 pb-12 flex flex-col items-center justify-start px-4 relative">
+          <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-80 h-80 bg-violet-500/5 rounded-full blur-[90px] pointer-events-none" />
+          <div className="w-full max-w-md p-10 bg-zinc-900/10 backdrop-blur-2xl border border-zinc-900/60 rounded-2xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7)] text-center animate-in fade-in duration-500">
+            <div className="inline-flex p-4 rounded-full bg-primary/10 mb-4 border border-primary/20">
+              <Upload className="w-10 h-10 text-primary" />
+            </div>
+            <h2 className="font-serif text-3xl font-light text-zinc-200 mt-6 mb-2 text-glow">Sign In Required</h2>
+            <p className="font-sans text-xs text-zinc-400 tracking-wide max-w-xs mx-auto mb-8 leading-relaxed">
+              Please sign in to access the digital listing engine and broadcast your architectural spaces.
+            </p>
+            <Button
+              className="w-full bg-violet-600 text-white hover:bg-violet-700 font-sans text-xs uppercase tracking-widest transition-all duration-300 py-4 rounded-xl font-semibold"
+              onClick={() => router.push("/login")}
+            >
+              Sign In / Register
+            </Button>
+          </div>
+        </div>
+      </AppLayout>
+    );
+  }
+
   const editId = searchParams.get("edit");
   const editingProperty = editId ? postedProperties.find((p) => p.id === editId) : null;
   const isEditMode = !!editingProperty;
